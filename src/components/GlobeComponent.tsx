@@ -9,14 +9,8 @@ interface PositionAndVelocity {
     error?: string;
 }
 
-interface SatelliteMesh extends THREE.Mesh {
-    satrec?: any;
-    glowMesh?: THREE.Mesh;
-}
-
 const GlobeComponent: React.FC = () => {
     const mountRef = useRef<HTMLDivElement | null>(null);
-    const satellitesMeshes = useRef<SatelliteMesh[]>([]);
 
     useEffect(() => {
         const currentMount = mountRef.current;
@@ -60,6 +54,44 @@ const GlobeComponent: React.FC = () => {
             undefined,
             (error) => console.error('Errore caricamento texture:', error)
         );
+
+        // Funzione per creare texture circolare
+        const createCircleTexture = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 16;
+            canvas.height = 16;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.beginPath();
+                ctx.arc(8, 8, 8, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+            }
+            return new THREE.CanvasTexture(canvas);
+        };
+
+        // Funzione per calcolare la posizione del satellite
+        const getSatellitePosition = (satrec: any, date: Date): THREE.Vector3 | null => {
+            const positionAndVelocity = satellite.propagate(satrec, date) as PositionAndVelocity | boolean;
+            if (typeof positionAndVelocity !== 'object' || !positionAndVelocity || !positionAndVelocity.position) {
+                return null;
+            }
+            const positionEci = positionAndVelocity.position;
+            const gmst = satellite.gstime(date);
+            const geodetic = satellite.eciToGeodetic(positionEci, gmst);
+            const latitude = satellite.degreesLat(geodetic.latitude);
+            const longitude = satellite.degreesLong(geodetic.longitude);
+            if (isNaN(latitude) || isNaN(longitude)) {
+                return null;
+            }
+            const phi = (90 - latitude) * Math.PI / 180;
+            const theta = -longitude * Math.PI / 180;
+            const radius = 5.2;
+            const x = radius * Math.sin(phi) * Math.cos(theta);
+            const y = radius * Math.cos(phi);
+            const z = radius * Math.sin(phi) * Math.sin(theta);
+            return new THREE.Vector3(x, y, z);
+        };
 
         // Fetch GeoJSON e rendering confini come linee
         fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson')
@@ -112,96 +144,58 @@ const GlobeComponent: React.FC = () => {
                         }
                         console.log('TLE Starlink fetchati:', starlinkTLEs.length);
 
-                        // Limita a 50 per performance
-                        const limitedTLEs = starlinkTLEs.slice(0, 50);
-                        let plotted = 0;
-                        limitedTLEs.forEach((sat) => {
+                        // Usa tutti i TLE, rappresentati come punti per efficienza
+                        let posArray: number[] = [];
+                        let satrecs: any[] = [];
+                        starlinkTLEs.forEach((sat) => {
                             const tleLine1 = sat.tleLine1;
                             const tleLine2 = sat.tleLine2;
                             if (tleLine1 && tleLine2) {
                                 try {
                                     const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-                                    const updatePosition = () => {
-                                        const date = new Date();
-                                        const positionAndVelocity = satellite.propagate(satrec, date) as PositionAndVelocity | boolean;
-                                        if (typeof positionAndVelocity === 'object' && positionAndVelocity && positionAndVelocity.position) {
-                                            const positionEci = positionAndVelocity.position;
-                                            const gmst = satellite.gstime(date);
-                                            const geodetic = satellite.eciToGeodetic(positionEci, gmst);
-                                            const latitude = satellite.degreesLat(geodetic.latitude);
-                                            const longitude = satellite.degreesLong(geodetic.longitude);
-
-                                            if (!isNaN(latitude) && !isNaN(longitude)) {
-                                                const phi = (90 - latitude) * Math.PI / 180;
-                                                const theta = -longitude * Math.PI / 180;
-                                                const radius = 5.2;
-                                                const x = radius * Math.sin(phi) * Math.cos(theta);
-                                                const y = radius * Math.cos(phi);
-                                                const z = radius * Math.sin(phi) * Math.sin(theta);
-                                                return new THREE.Vector3(x, y, z);
-                                            }
-                                        }
-                                        return null;
-                                    };
-
-                                    const position = updatePosition();
+                                    const position = getSatellitePosition(satrec, new Date());
                                     if (position) {
-                                        const satGeometry = new THREE.SphereGeometry(0.05, 8, 8);
-                                        const satMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1 }); // Bianco luminoso
-                                        const satMesh = new THREE.Mesh(satGeometry, satMaterial) as SatelliteMesh;
-                                        satMesh.position.copy(position);
-                                        satMesh.satrec = satrec;
-                                        scene.add(satMesh);
-
-                                        // Glow soffuso
-                                        const glowGeometry = new THREE.SphereGeometry(0.08, 8, 8);
-                                        const glowMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
-                                        const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-                                        glowMesh.position.copy(position);
-                                        scene.add(glowMesh);
-                                        satMesh.glowMesh = glowMesh;
-
-                                        satellitesMeshes.current.push(satMesh);
-                                        plotted++;
+                                        posArray.push(position.x, position.y, position.z);
+                                        satrecs.push(satrec);
                                     }
                                 } catch (error) {
                                     console.error('Errore calcolo posizione satellite:', error);
                                 }
                             }
                         });
-                        console.log('Satelliti plottati:', plotted);
+                        console.log('Satelliti plottati:', satrecs.length);
+
+                        // Crea un singolo oggetto Points per tutti i satelliti
+                        const positions = new Float32Array(posArray);
+                        const geometry = new THREE.BufferGeometry();
+                        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                        const material = new THREE.PointsMaterial({
+                            color: 0xffa500,
+                            size: 0.05,
+                            map: createCircleTexture(),
+                            transparent: true,
+                            alphaTest: 0.5
+                        });
+                        const points = new THREE.Points(geometry, material);
+                        scene.add(points);
+
+                        // Aggiornamento real-time ogni secondo
+                        const interval = setInterval(() => {
+                            const date = new Date();
+                            satrecs.forEach((satrec, i) => {
+                                const pos = getSatellitePosition(satrec, date);
+                                if (pos) {
+                                    positions[i * 3] = pos.x;
+                                    positions[i * 3 + 1] = pos.y;
+                                    positions[i * 3 + 2] = pos.z;
+                                }
+                            });
+                            geometry.attributes.position.needsUpdate = true;
+                        }, 1000);
+
+                        return () => clearInterval(interval);
                     })
                     .catch(error => console.error('Errore fetch TLE:', error));
-
-                // Aggiornamento real-time ogni secondo
-                const interval = setInterval(() => {
-                    satellitesMeshes.current.forEach((mesh) => {
-                        if (mesh.satrec) {
-                            const date = new Date();
-                            const positionAndVelocity = satellite.propagate(mesh.satrec, date) as PositionAndVelocity | boolean;
-                            if (typeof positionAndVelocity === 'object' && positionAndVelocity && positionAndVelocity.position) {
-                                const positionEci = positionAndVelocity.position;
-                                const gmst = satellite.gstime(date);
-                                const geodetic = satellite.eciToGeodetic(positionEci, gmst);
-                                const latitude = satellite.degreesLat(geodetic.latitude);
-                                const longitude = satellite.degreesLong(geodetic.longitude);
-
-                                if (!isNaN(latitude) && !isNaN(longitude)) {
-                                    const phi = (90 - latitude) * Math.PI / 180;
-                                    const theta = -longitude * Math.PI / 180;
-                                    const radius = 5.2;
-                                    const x = radius * Math.sin(phi) * Math.cos(theta);
-                                    const y = radius * Math.cos(phi);
-                                    const z = radius * Math.sin(phi) * Math.sin(theta);
-                                    mesh.position.set(x, y, z);
-                                    if (mesh.glowMesh) mesh.glowMesh.position.set(x, y, z);
-                                }
-                            }
-                        }
-                    });
-                }, 1000);
-
-                return () => clearInterval(interval);
             })
             .catch(error => console.error('Errore fetch GeoJSON:', error));
 
