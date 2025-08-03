@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useThreeScene } from './hooks/useThreeScene';
 import { useSatelliteData } from './hooks/useSatelliteData';
 import SatelliteCounter from '../SatelliteCounter/SatelliteCounter';
+import Legend from '../Legend/Legend';
 
 const Monitor: React.FC = () => {
     const mountRef = useRef<HTMLDivElement>(null);
@@ -11,6 +12,7 @@ const Monitor: React.FC = () => {
     return (
         <>
             <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
+            <Legend />
             <SatelliteCounter count={satelliteCount} isLoading={isLoading} />
         </>
     );

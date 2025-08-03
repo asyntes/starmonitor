@@ -1,0 +1,167 @@
+.service-legend {
+    position: fixed;
+    bottom: calc(2vh + 120px);
+    /* Sotto il SatelliteCounter */
+    right: 2vw;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    color: white;
+    font-family: 'Helvetica', 'sans-serif';
+    font-size: clamp(10px, 1vw, 12px);
+    font-weight: 500;
+    z-index: 999;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    max-width: 90vw;
+    box-sizing: border-box;
+}
+
+.service-legend:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.legend-title {
+    display: block;
+    font-size: clamp(9px, 0.9vw, 11px);
+    opacity: 0.8;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 2px;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+.legend-color.active {
+    background-color: #ffffff;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.4);
+}
+
+.legend-color.restricted {
+    background-color: #ff8800;
+    box-shadow: 0 0 4px rgba(255, 136, 0, 0.4);
+}
+
+.legend-color.banned {
+    background-color: #ff0000;
+    box-shadow: 0 0 4px rgba(255, 0, 0, 0.4);
+}
+
+.legend-label {
+    font-size: clamp(9px, 0.95vw, 11px);
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* Media query for smaller screens (e.g., mobile devices) */
+@media screen and (max-width: 768px) {
+    .service-legend {
+        bottom: calc(1vh + 100px);
+        /* Sotto il SatelliteCounter su mobile */
+        left: 2vw;
+        right: 2vw;
+        width: calc(100vw - 4vw);
+        padding: 0.8rem 1.2rem;
+        font-size: clamp(12px, 1.8vw, 14px);
+        border-radius: 0;
+        text-align: center;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+
+    .service-legend:hover {
+        transform: translateY(-2px);
+    }
+
+    .legend-items {
+        flex-direction: row;
+        justify-content: space-around;
+        gap: 1rem;
+    }
+
+    .legend-item {
+        flex-direction: column;
+        gap: 0.3rem;
+        align-items: center;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 3px;
+        border-radius: 1.5px;
+    }
+
+    .legend-title {
+        font-size: clamp(11px, 1.5vw, 13px);
+        margin-bottom: 0.5rem;
+    }
+
+    .legend-label {
+        font-size: clamp(10px, 1.4vw, 12px);
+    }
+}
+
+/* Media query for very small screens (e.g., narrow mobile devices) */
+@media screen and (max-width: 480px) {
+    .service-legend {
+        bottom: calc(0.5vh + 90px);
+        /* Sotto il SatelliteCounter su mobile piccolo */
+        left: 2vw;
+        right: 2vw;
+        width: calc(100vw - 4vw);
+        padding: 0.7rem 1rem;
+        font-size: clamp(11px, 2vw, 13px);
+        border-radius: 0;
+        text-align: center;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+
+    .service-legend:hover {
+        transform: translateY(-2px);
+    }
+
+    .legend-items {
+        gap: 0.8rem;
+    }
+
+    .legend-color {
+        width: 14px;
+        height: 2.5px;
+    }
+
+    .legend-title {
+        font-size: clamp(10px, 1.6vw, 12px);
+    }
+
+    .legend-label {
+        font-size: clamp(9px, 1.5vw, 11px);
+    }
+}

@@ -1,0 +1,79 @@
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: transparent;
+    padding: 1.5rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    align-items: flex-start;
+    max-width: 100%;
+}
+
+.main-title {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+    text-shadow:
+        0 0 10px rgba(255, 255, 255, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.1);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    letter-spacing: 0.5px;
+    margin-top: 0.2rem;
+}
+
+/* Hover effect per l'header */
+.app-header:hover .main-title {
+    text-shadow:
+        0 0 15px rgba(255, 255, 255, 0.4),
+        0 0 25px rgba(255, 255, 255, 0.2);
+}
+
+/* Media queries per dispositivi mobili */
+@media screen and (max-width: 768px) {
+    .app-header {
+        padding: 1rem 1.5rem;
+    }
+
+    .main-title {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+        letter-spacing: 1px;
+    }
+
+    .subtitle {
+        font-size: clamp(0.8rem, 2.5vw, 1rem);
+        margin-top: 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .app-header {
+        padding: 0.8rem 1rem;
+    }
+
+    .main-title {
+        font-size: clamp(1.2rem, 6vw, 1.8rem);
+    }
+
+    .subtitle {
+        font-size: clamp(0.7rem, 3vw, 0.9rem);
+    }
+}
