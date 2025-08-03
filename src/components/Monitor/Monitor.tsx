@@ -10,7 +10,7 @@ interface PositionAndVelocity {
     error?: string;
 }
 
-const GlobeComponent: React.FC = () => {
+const Monitor: React.FC = () => {
     const mountRef = useRef<HTMLDivElement | null>(null);
     const [satelliteCount, setSatelliteCount] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -303,7 +303,7 @@ const GlobeComponent: React.FC = () => {
             });
 
             const drawFeatures = (features: any[], isBanned: boolean) => {
-                features.forEach((feature: any, index: number) => {
+                features.forEach((feature: any) => {
                     if (!feature.geometry || !feature.geometry.coordinates) return;
 
                     const coordinates = feature.geometry.type === 'Polygon'
@@ -504,4 +504,4 @@ const GlobeComponent: React.FC = () => {
     );
 };
 
-export default GlobeComponent;
+export default Monitor;

@@ -1,10 +1,10 @@
 import React from 'react';
-import GlobeComponent from './components/GlobeComponent/GlobeComponent';
+import Monitor from './components/Monitor/Monitor';
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <GlobeComponent />
+      <Monitor />
     </div>
   );
 };
