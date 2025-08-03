@@ -1,6 +1,6 @@
 # Starmonitor
 
-Real-time 3D visualization of Starlink satellites orbiting Earth using React, Three.js, and live satellite data.
+3D visualization of Starlink satellites orbiting Earth using React, Three.js, and live satellite data.
 
 ## Features
 

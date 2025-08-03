@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import earthMap from '../../../assets/earth_atmos_2048.jpg?url';  // Up to src/, then into assets/
+import earthNormal from '../../../assets/earth_normal_2048.jpg?url';
 
 export const createCleanSpaceSkybox = (scene: THREE.Scene) => {
     const skyboxGeometry = new THREE.SphereGeometry(1000, 60, 40);
@@ -70,10 +72,10 @@ export const createEarth = (scene: THREE.Scene) => {
     const loader = new THREE.TextureLoader();
 
     loader.load(
-        'https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg',
+        earthMap,
         (texture) => {
             loader.load(
-                'https://threejs.org/examples/textures/planets/earth_normal_2048.jpg',
+                earthNormal,
                 (normalMap) => {
                     const geometry = new THREE.SphereGeometry(5, 64, 64);
                     const material = new THREE.MeshPhongMaterial({
