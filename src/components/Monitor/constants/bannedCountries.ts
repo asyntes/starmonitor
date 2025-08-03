@@ -1,5 +1,4 @@
 export const STARLINK_BANNED_COUNTRIES = new Set([
-    // Explicitly banned or heavily restricted - RED (based on sanctions, government bans, or no intention to launch as of August 2025)
     'China', 'People\'s Republic of China', 'PRC', '中国',
     'Russia', 'Russian Federation', 'Россия',
     'Iran', 'Islamic Republic of Iran', 'ایران',
@@ -13,7 +12,7 @@ export const STARLINK_BANNED_COUNTRIES = new Set([
     'Niue',
     'Turkmenistan', 'Туркменистан',
     'Sudan', 'Republic of the Sudan', 'سودان',
-    'South Africa', 'Republic of South Africa', 'Republiek van Suid-Afrika', 'Sudafrica', // Confirmed unavailable, roaming suspended June 2025
+    'South Africa', 'Republic of South Africa', 'Republiek van Suid-Afrika', 'Sudafrica',
     'Burkina Faso',
     'Cameroon', 'Cameroun',
     'Côte d\'Ivoire', 'Ivory Coast',
@@ -24,10 +23,11 @@ export const STARLINK_BANNED_COUNTRIES = new Set([
     'Libya', 'ليبيا',
     'Central African Republic', 'République Centrafricaine',
     'Mauritania', 'موريتانيا',
-    'Taiwan', // Failed due to ownership requirements
-    'Democratic Republic of the Congo', 'DRC', 'République Démocratique du Congo', // Explicitly banned
+    'Taiwan',
+    'Democratic Republic of the Congo', 'DRC', 'République Démocratique du Congo',
+]);
 
-    // Restricted, not approved, or pending regulatory approval - ORANGE (service not officially available, may have roaming issues or delays as of August 2025)
+export const STARLINK_RESTRICTED_COUNTRIES = new Set([
     'Namibia',
     'Equatorial Guinea', 'Guinea Ecuatorial',
     'Somalia', 'Soomaaliya',
@@ -45,7 +45,7 @@ export const STARLINK_BANNED_COUNTRIES = new Set([
     'Seychelles',
     'Togo',
     'Uganda',
-    'India', 'भारत', // Partnerships in March 2025, but rollout pending government approvals
+    'India', 'भारत',
     'Pakistan', 'پاکستان',
     'Saudi Arabia', 'المملكة العربية السعودية',
     'United Arab Emirates', 'UAE', 'الإمارات العربية المتحدة',
@@ -74,18 +74,18 @@ export const STARLINK_BANNED_COUNTRIES = new Set([
     'Montenegro',
     'Bosnia and Herzegovina',
     'Greenland',
-    'South Korea', 'Korea Republic of', // Not pursued due to existing broadband
+    'South Korea', 'Korea Republic of',
     'Nepal',
     'Papua New Guinea',
     'New Caledonia', 'Nouvelle-Calédonie',
     'French Polynesia', 'Polynésie Française',
-    'Turkey', 'Türkiye', // Pending approval
+    'Turkey', 'Türkiye',
     'Angola',
     'Ghana',
     'Cape Verde', 'Cabo Verde',
     'Gabon',
     'Republic of the Congo', 'Congo-Brazzaville',
-    'Morocco', 'المغرب', // Approved but not yet launched
+    'Morocco', 'المغرب',
     'Western Sahara', 'Sahara Occidental'
 ]);
 
@@ -103,4 +103,20 @@ export const hasStarlinkBanned = (feature: any): boolean => {
     ].filter(Boolean);
 
     return possibleNames.some(name => STARLINK_BANNED_COUNTRIES.has(name));
+};
+
+export const hasStarlinkRestricted = (feature: any): boolean => {
+    if (!feature.properties) return false;
+
+    const possibleNames = [
+        feature.properties.name,
+        feature.properties.NAME,
+        feature.properties.ADMIN,
+        feature.properties.NAME_EN,
+        feature.properties.SOVEREIGNT,
+        feature.properties.GEOUNIT,
+        feature.properties.NAME_LONG
+    ].filter(Boolean);
+
+    return possibleNames.some(name => STARLINK_RESTRICTED_COUNTRIES.has(name));
 };

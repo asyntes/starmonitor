@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { hasStarlinkBanned } from '../constants/bannedCountries';
+import { hasStarlinkBanned, hasStarlinkRestricted } from '../constants/bannedCountries';
 
 export const loadGeographicData = async () => {
     try {
@@ -113,17 +113,20 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
     }
 
     const bannedFeatures: any[] = [];
+    const restrictedFeatures: any[] = [];
     const normalFeatures: any[] = [];
 
     geoData.features.forEach((feature: any) => {
         if (hasStarlinkBanned(feature)) {
             bannedFeatures.push(feature);
+        } else if (hasStarlinkRestricted(feature)) {
+            restrictedFeatures.push(feature);
         } else {
             normalFeatures.push(feature);
         }
     });
 
-    const drawFeatures = (features: any[], isBanned: boolean) => {
+    const drawFeatures = (features: any[], category: 'normal' | 'restricted' | 'banned') => {
         features.forEach((feature: any) => {
             if (!feature.geometry || !feature.geometry.coordinates) return;
 
@@ -139,7 +142,20 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                     const [lon, lat] = coord;
                     const phi = (90 - lat) * Math.PI / 180;
                     const theta = -lon * Math.PI / 180;
-                    const radius = 5.01;
+
+                    let radius: number;
+                    switch (category) {
+                        case 'banned':
+                            radius = 5.015;
+                            break;
+                        case 'restricted':
+                            radius = 5.012;
+                            break;
+                        default:
+                            radius = 5.01;
+                            break;
+                    }
+
                     const x = radius * Math.sin(phi) * Math.cos(theta);
                     const y = radius * Math.cos(phi);
                     const z = radius * Math.sin(phi) * Math.sin(theta);
@@ -154,16 +170,27 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                     let lineColor: number;
                     let lineWidth = 1;
                     let opacity = 0.8;
+                    let renderOrder = 0;
 
-                    if (isBanned) {
-                        lineColor = 0xff0000;
-                        lineWidth = 3;
-                        opacity = 1.0;
-
-                    } else {
-                        lineColor = 0xffffff;
-                        lineWidth = 1;
-                        opacity = 0.6;
+                    switch (category) {
+                        case 'banned':
+                            lineColor = 0xff0000;
+                            lineWidth = 3;
+                            opacity = 1.0;
+                            renderOrder = 1000;
+                            break;
+                        case 'restricted':
+                            lineColor = 0xff8800;
+                            lineWidth = 2;
+                            opacity = 0.9;
+                            renderOrder = 500;
+                            break;
+                        default:
+                            lineColor = 0xffffff;
+                            lineWidth = 1;
+                            opacity = 0.6;
+                            renderOrder = 0;
+                            break;
                     }
 
                     const lineMaterial = new THREE.LineBasicMaterial({
@@ -171,18 +198,12 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                         opacity: opacity,
                         transparent: true,
                         linewidth: lineWidth,
-                        depthWrite: isBanned ? true : false,
+                        depthWrite: category !== 'normal',
                         depthTest: true
                     });
 
                     const borderLine = new THREE.Line(geometry, lineMaterial);
-
-                    if (isBanned) {
-                        borderLine.position.setLength(borderLine.position.length() * 1.01);
-                        borderLine.renderOrder = 1000;
-                    } else {
-                        borderLine.renderOrder = 0;
-                    }
+                    borderLine.renderOrder = renderOrder;
 
                     scene.add(borderLine);
                 }
@@ -190,6 +211,7 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
         });
     };
 
-    drawFeatures(normalFeatures, false);
-    drawFeatures(bannedFeatures, true);
+    drawFeatures(normalFeatures, 'normal');
+    drawFeatures(restrictedFeatures, 'restricted');
+    drawFeatures(bannedFeatures, 'banned');
 };
