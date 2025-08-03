@@ -28,7 +28,6 @@ export const useThreeScene = (
         loadGeographicData().then((geoData) => {
             drawGeographicBorders(scene, geoData);
 
-            // Carica i satelliti dopo i dati geografici, come nell'originale
             fetchTLEData()
                 .then(tleData => {
                     const { positions, satrecs, geometry } = createSatellitePoints(scene, tleData);
@@ -54,7 +53,6 @@ export const useThreeScene = (
                         setSatelliteCount(activeCount);
                     }, 1000);
 
-                    // Aggiungi il cleanup dell'intervallo al return della useEffect
                     cleanupFunctions.push(() => clearInterval(intervalId));
                 })
                 .catch(error => {
@@ -99,7 +97,6 @@ export const useThreeScene = (
             cancelAnimationFrame(animationFrameId);
             controls.dispose();
             renderer.dispose();
-            // Esegui tutti i cleanup aggiuntivi (come l'intervallo satelliti)
             cleanupFunctions.forEach(cleanup => cleanup());
         };
     }, [mountRef, setSatelliteCount, setIsLoading]);
