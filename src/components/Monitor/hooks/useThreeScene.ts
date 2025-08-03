@@ -25,6 +25,8 @@ export const useThreeScene = (
         setupLighting(scene);
         createEarth(scene);
 
+        let isAutoRotating = true;
+
         loadGeographicData().then((geoData) => {
             drawGeographicBorders(scene, geoData);
 
@@ -71,12 +73,18 @@ export const useThreeScene = (
         controls.maxDistance = 20;
         controls.enablePan = false;
 
+        controls.addEventListener('change', () => {
+            isAutoRotating = false;
+        });
+
         let animationFrameId: number;
         const cleanupFunctions: (() => void)[] = [];
 
         const animate = () => {
             animationFrameId = requestAnimationFrame(animate);
-            scene.rotation.y += 0.001;
+            if (isAutoRotating) {
+                scene.rotation.y += 0.001;
+            }
             controls.update();
             renderer.render(scene, camera);
         };
