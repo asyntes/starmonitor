@@ -96,10 +96,8 @@
         width: calc(100vw - 4vw);
         padding: 1rem 1.5rem;
         font-size: clamp(14px, 2vw, 16px);
-        /* Increased font size */
         border-radius: 0;
         text-align: center;
-        max-width: 100%;
         margin: 0 auto;
         box-sizing: border-box;
     }
@@ -132,10 +130,8 @@
         width: calc(100vw - 4vw);
         padding: 0.8rem 1.2rem;
         font-size: clamp(13px, 2.2vw, 15px);
-        /* Increased font size */
         border-radius: 0;
         text-align: center;
-        max-width: 100%;
         margin: 0 auto;
         box-sizing: border-box;
     }

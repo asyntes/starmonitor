@@ -80,3 +80,9 @@ body,
   padding: 0;
   overflow: hidden;
 }
+
+.App {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
