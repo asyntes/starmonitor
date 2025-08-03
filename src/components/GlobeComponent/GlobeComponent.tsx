@@ -25,6 +25,36 @@ const GlobeComponent: React.FC = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
         currentMount.appendChild(renderer.domElement);
 
+        // 🔴 Starlink Banned Countries
+        const starlinkBannedCountries = new Set([
+            'China', 'People\'s Republic of China', 'PRC', '中国',
+            'Russia', 'Russian Federation', 'Россия',
+            'Iran', 'Islamic Republic of Iran', 'ایران',
+            'North Korea', 'Democratic People\'s Republic of Korea', 'DPRK', '북한',
+            'Belarus', 'Беларусь',
+            'Syria', 'Syrian Arab Republic', 'سوريا',
+            'Afghanistan', 'افغانستان',
+            'Myanmar', 'Burma', 'မြန်မာ',
+            'Cuba', 'República de Cuba',
+            'Venezuela', 'Bolivarian Republic of Venezuela'
+        ]);
+
+        const hasStarlinkBanned = (feature: any): boolean => {
+            if (!feature.properties) return false;
+
+            const possibleNames = [
+                feature.properties.name,
+                feature.properties.NAME,
+                feature.properties.ADMIN,
+                feature.properties.NAME_EN,
+                feature.properties.SOVEREIGNT,
+                feature.properties.GEOUNIT,
+                feature.properties.NAME_LONG
+            ].filter(Boolean);
+
+            return possibleNames.some(name => starlinkBannedCountries.has(name));
+        };
+
         const createCleanSpaceSkybox = () => {
             const skyboxGeometry = new THREE.SphereGeometry(1000, 60, 40);
 
@@ -81,7 +111,6 @@ const GlobeComponent: React.FC = () => {
             scene.add(skybox);
 
             scene.background = texture;
-            console.log('Skybox con stelline ultra-minuscole creata');
         };
 
         createCleanSpaceSkybox();
@@ -151,16 +180,139 @@ const GlobeComponent: React.FC = () => {
             return new THREE.Vector3(x, y, z);
         };
 
-        fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson')
-            .then(response => response.json())
-            .then((data: any) => {
-                console.log('GeoJSON caricato:', data.features.length, 'paesi');
-                data.features.forEach((feature: any) => {
+        const loadGeographicData = async () => {
+            try {
+                const worldResponse = await fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson');
+                const worldData = await worldResponse.json();
+
+                const worldWithoutUSA = {
+                    type: "FeatureCollection",
+                    features: worldData.features.filter((feature: any) =>
+                        feature.properties.NAME !== 'United States of America' &&
+                        feature.properties.NAME_EN !== 'United States of America' &&
+                        feature.properties.ADMIN !== 'United States of America'
+                    )
+                };
+
+                let usStatesData = null;
+                const usStateUrls = [
+                    'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json',
+                    'https://raw.githubusercontent.com/alabarga/world-geojson/master/countries/USA/states.json',
+                    'https://d3js.org/us-10m.v1.json', // TopoJSON, necessita conversione
+                    'https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json'
+                ];
+
+                for (const url of usStateUrls) {
+                    try {
+                        const response = await fetch(url);
+                        if (response.ok) {
+                            const data = await response.json();
+
+                            if (data.type === 'Topology') {
+                                continue;
+                            } else if (data.type === 'FeatureCollection') {
+                                usStatesData = data;
+                                break;
+                            }
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+
+                if (!usStatesData) {
+                    usStatesData = {
+                        type: "FeatureCollection",
+                        features: [
+                            {
+                                type: "Feature",
+                                properties: { name: "California", type: "state" },
+                                geometry: {
+                                    type: "Polygon",
+                                    coordinates: [[
+                                        [-124.4, 42.0], [-124.4, 32.5], [-114.1, 32.5],
+                                        [-114.1, 42.0], [-124.4, 42.0]
+                                    ]]
+                                }
+                            },
+                            {
+                                type: "Feature",
+                                properties: { name: "Texas", type: "state" },
+                                geometry: {
+                                    type: "Polygon",
+                                    coordinates: [[
+                                        [-106.6, 31.8], [-93.5, 31.8], [-93.5, 36.5],
+                                        [-106.6, 36.5], [-106.6, 31.8]
+                                    ]]
+                                }
+                            },
+                            {
+                                type: "Feature",
+                                properties: { name: "Florida", type: "state" },
+                                geometry: {
+                                    type: "Polygon",
+                                    coordinates: [[
+                                        [-87.6, 24.5], [-80.0, 24.5], [-80.0, 31.0],
+                                        [-87.6, 31.0], [-87.6, 24.5]
+                                    ]]
+                                }
+                            },
+                            {
+                                type: "Feature",
+                                properties: { name: "New York", type: "state" },
+                                geometry: {
+                                    type: "Polygon",
+                                    coordinates: [[
+                                        [-79.8, 40.5], [-71.9, 40.5], [-71.9, 45.0],
+                                        [-79.8, 45.0], [-79.8, 40.5]
+                                    ]]
+                                }
+                            }
+                        ]
+                    };
+                }
+
+                const combinedGeoData = {
+                    type: "FeatureCollection",
+                    features: [...worldWithoutUSA.features, ...usStatesData.features]
+                };
+
+                return combinedGeoData;
+            } catch (error) {
+                console.error('Errore nel caricamento dei dati geografici:', error);
+                const response = await fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson');
+                return await response.json();
+            }
+        };
+
+        const drawGeographicBorders = (geoData: any) => {
+            if (!geoData || !geoData.features) {
+                console.error('Dati GeoJSON non validi');
+                return;
+            }
+
+            const bannedFeatures: any[] = [];
+            const normalFeatures: any[] = [];
+
+            geoData.features.forEach((feature: any) => {
+                if (hasStarlinkBanned(feature)) {
+                    bannedFeatures.push(feature);
+                } else {
+                    normalFeatures.push(feature);
+                }
+            });
+
+            const drawFeatures = (features: any[], isBanned: boolean) => {
+                features.forEach((feature: any, index: number) => {
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
+
                     const coordinates = feature.geometry.type === 'Polygon'
                         ? [feature.geometry.coordinates]
                         : feature.geometry.coordinates;
 
                     coordinates.forEach((polygon: any) => {
+                        if (!polygon || !polygon[0]) return;
+
                         const ring = polygon[0];
                         const points: THREE.Vector3[] = ring.map((coord: [number, number]) => {
                             const [lon, lat] = coord;
@@ -173,96 +325,137 @@ const GlobeComponent: React.FC = () => {
                             return new THREE.Vector3(x, y, z);
                         });
 
-                        points.push(points[0]);
+                        if (points.length > 0) {
+                            points.push(points[0]);
 
-                        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-                        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-                        const borderLine = new THREE.Line(geometry, lineMaterial);
-                        scene.add(borderLine);
+                            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+                            let lineColor: number;
+                            let lineWidth = 1;
+                            let opacity = 0.8;
+
+                            if (isBanned) {
+                                lineColor = 0xff0000;
+                                lineWidth = 3;
+                                opacity = 1.0;
+
+                                const displayName = feature.properties?.name ||
+                                    feature.properties?.NAME ||
+                                    feature.properties?.ADMIN ||
+                                    'Unknown';
+                                console.log('🔴 Starlink banned:', displayName);
+                            } else {
+                                lineColor = 0xffffff;
+                                lineWidth = 1;
+                                opacity = 0.6;
+                            }
+
+                            const lineMaterial = new THREE.LineBasicMaterial({
+                                color: lineColor,
+                                opacity: opacity,
+                                transparent: true,
+                                linewidth: lineWidth,
+                                depthWrite: isBanned ? true : false,
+                                depthTest: true
+                            });
+
+                            const borderLine = new THREE.Line(geometry, lineMaterial);
+
+                            if (isBanned) {
+                                borderLine.position.setLength(borderLine.position.length() * 1.01);
+                                borderLine.renderOrder = 1000;
+                            } else {
+                                borderLine.renderOrder = 0;
+                            }
+
+                            scene.add(borderLine);
+                        }
                     });
                 });
+            };
 
-                const celestrakUrl = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle';
-                fetch(`https://corsproxy.io/?${encodeURIComponent(celestrakUrl)}`)
-                    .then(response => response.text())
-                    .then(tleText => {
-                        const lines = tleText.trim().split('\n');
-                        const starlinkTLEs = [];
-                        for (let i = 0; i < lines.length; i += 3) {
-                            if (lines[i] && lines[i + 1] && lines[i + 2]) {
-                                starlinkTLEs.push({
-                                    name: lines[i].trim(),
-                                    tleLine1: lines[i + 1].trim(),
-                                    tleLine2: lines[i + 2].trim(),
-                                });
+            drawFeatures(normalFeatures, false);
+
+            drawFeatures(bannedFeatures, true);
+        };
+
+        loadGeographicData().then((geoData) => {
+            drawGeographicBorders(geoData);
+
+            const celestrakUrl = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle';
+            fetch(`https://corsproxy.io/?${encodeURIComponent(celestrakUrl)}`)
+                .then(response => response.text())
+                .then(tleText => {
+                    const lines = tleText.trim().split('\n');
+                    const starlinkTLEs = [];
+                    for (let i = 0; i < lines.length; i += 3) {
+                        if (lines[i] && lines[i + 1] && lines[i + 2]) {
+                            starlinkTLEs.push({
+                                name: lines[i].trim(),
+                                tleLine1: lines[i + 1].trim(),
+                                tleLine2: lines[i + 2].trim(),
+                            });
+                        }
+                    }
+
+                    let posArray: number[] = [];
+                    let satrecs: any[] = [];
+                    starlinkTLEs.forEach((sat) => {
+                        const tleLine1 = sat.tleLine1;
+                        const tleLine2 = sat.tleLine2;
+                        if (tleLine1 && tleLine2) {
+                            try {
+                                const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+                                const position = getSatellitePosition(satrec, new Date());
+                                if (position) {
+                                    posArray.push(position.x, position.y, position.z);
+                                    satrecs.push(satrec);
+                                }
+                            } catch (error) {
+                                console.error('Errore calcolo posizione satellite:', error);
                             }
                         }
-                        console.log('TLE Starlink fetchati:', starlinkTLEs.length);
+                    });
 
-                        let posArray: number[] = [];
-                        let satrecs: any[] = [];
-                        starlinkTLEs.forEach((sat) => {
-                            const tleLine1 = sat.tleLine1;
-                            const tleLine2 = sat.tleLine2;
-                            if (tleLine1 && tleLine2) {
-                                try {
-                                    const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-                                    const position = getSatellitePosition(satrec, new Date());
-                                    if (position) {
-                                        posArray.push(position.x, position.y, position.z);
-                                        satrecs.push(satrec);
-                                    }
-                                } catch (error) {
-                                    console.error('Errore calcolo posizione satellite:', error);
-                                }
+                    setSatelliteCount(satrecs.length);
+                    setIsLoading(false);
+
+                    const positions = new Float32Array(posArray);
+                    const geometry = new THREE.BufferGeometry();
+                    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                    const material = new THREE.PointsMaterial({
+                        color: 0x00ff00,
+                        size: 0.03,
+                        map: createCircleTexture(),
+                        transparent: true,
+                        alphaTest: 0.5
+                    });
+                    const points = new THREE.Points(geometry, material);
+                    scene.add(points);
+
+                    const interval = setInterval(() => {
+                        const date = new Date();
+                        let activeCount = 0;
+                        satrecs.forEach((satrec, i) => {
+                            const pos = getSatellitePosition(satrec, date);
+                            if (pos) {
+                                positions[i * 3] = pos.x;
+                                positions[i * 3 + 1] = pos.y;
+                                positions[i * 3 + 2] = pos.z;
+                                activeCount++;
                             }
                         });
+                        geometry.attributes.position.needsUpdate = true;
+                        setSatelliteCount(activeCount);
+                    }, 1000);
 
-                        setSatelliteCount(satrecs.length);
-                        setIsLoading(false);
-
-                        console.log('Satelliti plottati:', satrecs.length);
-
-                        const positions = new Float32Array(posArray);
-                        const geometry = new THREE.BufferGeometry();
-                        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                        const material = new THREE.PointsMaterial({
-                            color: 0xffa500,
-                            size: 0.03,
-                            map: createCircleTexture(),
-                            transparent: true,
-                            alphaTest: 0.5
-                        });
-                        const points = new THREE.Points(geometry, material);
-                        scene.add(points);
-
-                        const interval = setInterval(() => {
-                            const date = new Date();
-                            let activeCount = 0;
-                            satrecs.forEach((satrec, i) => {
-                                const pos = getSatellitePosition(satrec, date);
-                                if (pos) {
-                                    positions[i * 3] = pos.x;
-                                    positions[i * 3 + 1] = pos.y;
-                                    positions[i * 3 + 2] = pos.z;
-                                    activeCount++;
-                                }
-                            });
-                            geometry.attributes.position.needsUpdate = true;
-                            setSatelliteCount(activeCount);
-                        }, 1000);
-
-                        return () => clearInterval(interval);
-                    })
-                    .catch(error => {
-                        console.error('Errore fetch TLE:', error);
-                        setIsLoading(false);
-                    });
-            })
-            .catch(error => {
-                console.error('Errore fetch GeoJSON:', error);
-                setIsLoading(false);
-            });
+                    return () => clearInterval(interval);
+                })
+                .catch(error => {
+                    console.error('Errore fetch TLE:', error);
+                    setIsLoading(false);
+                });
+        });
 
         camera.position.z = 10;
 
