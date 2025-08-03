@@ -1,6 +1,7 @@
 .satellite-counter {
     position: fixed;
-    bottom: 2vh;
+    bottom: calc(2vh + 120px);
+    /* Alzato sopra la legend */
     right: 2vw;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
@@ -90,7 +91,8 @@
 /* Media query for smaller screens (e.g., mobile devices) */
 @media screen and (max-width: 768px) {
     .satellite-counter {
-        bottom: 1vh;
+        bottom: calc(1vh + 110px);
+        /* Alzato sopra la legend */
         left: 2vw;
         right: 2vw;
         width: calc(100vw - 4vw);
@@ -124,7 +126,8 @@
 /* Media query for very small screens (e.g., narrow mobile devices) */
 @media screen and (max-width: 480px) {
     .satellite-counter {
-        bottom: 0.5vh;
+        bottom: calc(0.5vh + 100px);
+        /* Alzato sopra la legend */
         left: 2vw;
         right: 2vw;
         width: calc(100vw - 4vw);
