@@ -160,11 +160,6 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                         lineWidth = 3;
                         opacity = 1.0;
 
-                        const displayName = feature.properties?.name ||
-                            feature.properties?.NAME ||
-                            feature.properties?.ADMIN ||
-                            'Unknown';
-                        console.log('🔴 Starlink banned:', displayName);
                     } else {
                         lineColor = 0xffffff;
                         lineWidth = 1;

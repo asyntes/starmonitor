@@ -14,6 +14,7 @@ const SatelliteCounter: React.FC<SatelliteCounterProps> = ({ count, isLoading })
             <span className={`counter-status ${isLoading ? 'status-loading' : 'status-live'}`}>
                 {isLoading ? 'Loading...' : 'Live'}
             </span>
+            <span className="counter-source">via CelesTrak API</span>
         </div>
     );
 };
