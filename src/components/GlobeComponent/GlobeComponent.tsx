@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // Aggiunto .js come richiesto
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as satellite from 'satellite.js';
+import SatelliteCounter from '../SatelliteCounter/SatelliteCounter';
 
 interface PositionAndVelocity {
     position?: { x: number; y: number; z: number };
@@ -11,6 +12,8 @@ interface PositionAndVelocity {
 
 const GlobeComponent: React.FC = () => {
     const mountRef = useRef<HTMLDivElement | null>(null);
+    const [satelliteCount, setSatelliteCount] = useState<number>(0);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const currentMount = mountRef.current;
@@ -22,6 +25,111 @@ const GlobeComponent: React.FC = () => {
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         currentMount.appendChild(renderer.domElement);
+
+        // Crea skybox minimalista e pulita stile satellitemap.space
+        const createCleanSpaceSkybox = () => {
+            const skyboxGeometry = new THREE.SphereGeometry(1000, 60, 40);
+
+            // Crea texture minimalista e pulita
+            const canvas = document.createElement('canvas');
+            canvas.width = 2048;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
+            if (ctx) {
+                // Sfondo gradiente spazio profondo molto sottile
+                const gradient = ctx.createLinearGradient(0, 0, 0, 1024);
+                gradient.addColorStop(0, '#0a0a0f');
+                gradient.addColorStop(0.5, '#000000');
+                gradient.addColorStop(1, '#0a0a0f');
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, 2048, 1024);
+
+                // Stelle minimaliste e sparse
+                ctx.fillStyle = '#ffffff';
+                for (let i = 0; i < 800; i++) {
+                    const x = Math.random() * 2048;
+                    const y = Math.random() * 1024;
+                    const brightness = Math.random();
+
+                    if (brightness > 0.98) {
+                        // Stelle molto luminose (rare)
+                        ctx.globalAlpha = 0.9;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (brightness > 0.9) {
+                        // Stelle luminose
+                        ctx.globalAlpha = 0.7;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (brightness > 0.7) {
+                        // Stelle normali
+                        ctx.globalAlpha = 0.5;
+                        ctx.beginPath();
+                        ctx.arc(x, y, 0.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // Via Lattea molto sottile e discreta
+                ctx.globalAlpha = 0.15;
+                const milkyWayY = 512;
+                const milkyWayHeight = 80;
+
+                const milkyWayGradient = ctx.createLinearGradient(0, milkyWayY - milkyWayHeight / 2, 0, milkyWayY + milkyWayHeight / 2);
+                milkyWayGradient.addColorStop(0, 'transparent');
+                milkyWayGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
+                milkyWayGradient.addColorStop(1, 'transparent');
+
+                ctx.fillStyle = milkyWayGradient;
+                ctx.fillRect(0, milkyWayY - milkyWayHeight / 2, 2048, milkyWayHeight);
+
+                // Qualche stella più luminosa sparsa
+                const brightStars = [
+                    { x: 400, y: 200 },
+                    { x: 800, y: 700 },
+                    { x: 1200, y: 300 },
+                    { x: 1600, y: 800 },
+                    { x: 300, y: 600 }
+                ];
+
+                ctx.globalAlpha = 0.8;
+                ctx.fillStyle = '#ffffff';
+                brightStars.forEach(star => {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Bagliore sottile
+                    ctx.globalAlpha = 0.3;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 0.8;
+                });
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+
+            const skyboxMaterial = new THREE.MeshBasicMaterial({
+                map: texture,
+                side: THREE.BackSide,
+                fog: false
+            });
+
+            const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
+            scene.add(skybox);
+
+            scene.background = texture;
+            console.log('Skybox pulita stile satellitemap.space creata');
+        };
+
+        // Crea la skybox pulita e minimalista
+        createCleanSpaceSkybox();
 
         // Aggiungi luci per profondità
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -163,6 +271,11 @@ const GlobeComponent: React.FC = () => {
                                 }
                             }
                         });
+
+                        // Aggiorna il contatore dei satelliti
+                        setSatelliteCount(satrecs.length);
+                        setIsLoading(false);
+
                         console.log('Satelliti plottati:', satrecs.length);
 
                         // Crea un singolo oggetto Points per tutti i satelliti
@@ -182,22 +295,32 @@ const GlobeComponent: React.FC = () => {
                         // Aggiornamento real-time ogni secondo
                         const interval = setInterval(() => {
                             const date = new Date();
+                            let activeCount = 0;
                             satrecs.forEach((satrec, i) => {
                                 const pos = getSatellitePosition(satrec, date);
                                 if (pos) {
                                     positions[i * 3] = pos.x;
                                     positions[i * 3 + 1] = pos.y;
                                     positions[i * 3 + 2] = pos.z;
+                                    activeCount++;
                                 }
                             });
                             geometry.attributes.position.needsUpdate = true;
+                            // Aggiorna il contatore se necessario
+                            setSatelliteCount(activeCount);
                         }, 1000);
 
                         return () => clearInterval(interval);
                     })
-                    .catch(error => console.error('Errore fetch TLE:', error));
+                    .catch(error => {
+                        console.error('Errore fetch TLE:', error);
+                        setIsLoading(false);
+                    });
             })
-            .catch(error => console.error('Errore fetch GeoJSON:', error));
+            .catch(error => {
+                console.error('Errore fetch GeoJSON:', error);
+                setIsLoading(false);
+            });
 
         camera.position.z = 10;
 
@@ -215,7 +338,10 @@ const GlobeComponent: React.FC = () => {
         let animationFrameId: number;
         const animate = () => {
             animationFrameId = requestAnimationFrame(animate);
+
+            // Rotazione lenta del globo
             scene.rotation.y += 0.001;
+
             controls.update();
             renderer.render(scene, camera);
         };
@@ -241,7 +367,12 @@ const GlobeComponent: React.FC = () => {
         };
     }, []);
 
-    return <div ref={mountRef} style={{ width: '100%', height: '100%' }} />;
+    return (
+        <>
+            <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
+            <SatelliteCounter count={satelliteCount} isLoading={isLoading} />
+        </>
+    );
 };
 
 export default GlobeComponent;
