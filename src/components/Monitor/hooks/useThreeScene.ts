@@ -25,6 +25,11 @@ export const useThreeScene = (
         setupLighting(scene);
         createEarth(scene);
 
+        // Impostazione rotazione iniziale "indietro nel tempo"
+        // Simuliamo circa 10-15 secondi indietro (rotazione di ~0.01-0.015 radianti)
+        const initialBackwardRotation = -0.3; // Circa 12 secondi indietro
+        scene.rotation.y = initialBackwardRotation;
+
         let isAutoRotating = true;
 
         loadGeographicData().then((geoData) => {
