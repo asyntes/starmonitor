@@ -329,10 +329,9 @@ const GlobeComponent: React.FC = () => {
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.screenSpacePanning = false;
-        controls.minDistance = 5;
-        controls.maxDistance = 50;
+        controls.minDistance = 7;
+        controls.maxDistance = 20;
         controls.enablePan = false;
-        controls.enableZoom = false;
 
         // Funzione di animazione
         let animationFrameId: number;
