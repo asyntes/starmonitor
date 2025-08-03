@@ -111,7 +111,6 @@ const GlobeComponent: React.FC = () => {
             scene.add(skybox);
 
             scene.background = texture;
-            console.log('Skybox con stelline ultra-minuscole creata');
         };
 
         createCleanSpaceSkybox();
@@ -195,8 +194,6 @@ const GlobeComponent: React.FC = () => {
                     )
                 };
 
-                console.log('Paesi mondiali caricati (senza USA):', worldWithoutUSA.features.length);
-
                 let usStatesData = null;
                 const usStateUrls = [
                     'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json',
@@ -207,27 +204,23 @@ const GlobeComponent: React.FC = () => {
 
                 for (const url of usStateUrls) {
                     try {
-                        console.log(`Tentando caricamento stati USA da: ${url}`);
                         const response = await fetch(url);
                         if (response.ok) {
                             const data = await response.json();
 
                             if (data.type === 'Topology') {
-                                console.log('Formato TopoJSON rilevato, conversione necessaria');
                                 continue;
                             } else if (data.type === 'FeatureCollection') {
                                 usStatesData = data;
-                                console.log(`Stati USA caricati da: ${url}, stati trovati: ${data.features.length}`);
                                 break;
                             }
                         }
                     } catch (error) {
-                        console.log(`Fallito caricamento stati USA da ${url}:`, error);
+                        console.log(error);
                     }
                 }
 
                 if (!usStatesData) {
-                    console.log('Usando fallback per stati USA...');
                     usStatesData = {
                         type: "FeatureCollection",
                         features: [
@@ -298,8 +291,6 @@ const GlobeComponent: React.FC = () => {
                 return;
             }
 
-            console.log('Funzioni geografiche da disegnare:', geoData.features.length);
-
             const bannedFeatures: any[] = [];
             const normalFeatures: any[] = [];
 
@@ -352,7 +343,7 @@ const GlobeComponent: React.FC = () => {
                                     feature.properties?.NAME ||
                                     feature.properties?.ADMIN ||
                                     'Unknown';
-                                console.log('🔴 Starlink vietato:', displayName);
+                                console.log('🔴 Starlink banned:', displayName);
                             } else {
                                 lineColor = 0xffffff;
                                 lineWidth = 1;
@@ -383,10 +374,8 @@ const GlobeComponent: React.FC = () => {
                 });
             };
 
-            console.log('Disegnando paesi normali:', normalFeatures.length);
             drawFeatures(normalFeatures, false);
 
-            console.log('Disegnando paesi banned:', bannedFeatures.length);
             drawFeatures(bannedFeatures, true);
         };
 
@@ -408,7 +397,6 @@ const GlobeComponent: React.FC = () => {
                             });
                         }
                     }
-                    console.log('TLE Starlink fetchati:', starlinkTLEs.length);
 
                     let posArray: number[] = [];
                     let satrecs: any[] = [];
@@ -431,8 +419,6 @@ const GlobeComponent: React.FC = () => {
 
                     setSatelliteCount(satrecs.length);
                     setIsLoading(false);
-
-                    console.log('Satelliti plottati:', satrecs.length);
 
                     const positions = new Float32Array(posArray);
                     const geometry = new THREE.BufferGeometry();
