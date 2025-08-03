@@ -63,7 +63,8 @@ export const useThreeScene = (
                 });
         });
 
-        camera.position.z = 10;
+        // Adjust camera zoom based on screen size
+        camera.position.z = window.innerWidth <= 768 ? 15 : 10; // Zoom out more on mobile
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -92,6 +93,7 @@ export const useThreeScene = (
 
         const handleResize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
+            camera.position.z = window.innerWidth <= 768 ? 15 : 10; // Update zoom on resize
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         };
