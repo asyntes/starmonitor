@@ -25,11 +25,23 @@ const GlobeComponent: React.FC = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
         currentMount.appendChild(renderer.domElement);
 
-        // Funzione per verificare se un paese/stato ha copertura Starlink
-        const hasStarlinkCoverage = (feature: any): boolean => {
+        // 🔴 Starlink Banned Countries
+        const starlinkBannedCountries = new Set([
+            'China', 'People\'s Republic of China', 'PRC', '中国',
+            'Russia', 'Russian Federation', 'Россия',
+            'Iran', 'Islamic Republic of Iran', 'ایران',
+            'North Korea', 'Democratic People\'s Republic of Korea', 'DPRK', '북한',
+            'Belarus', 'Беларусь',
+            'Syria', 'Syrian Arab Republic', 'سوريا',
+            'Afghanistan', 'افغانستان',
+            'Myanmar', 'Burma', 'မြန်မာ',
+            'Cuba', 'República de Cuba',
+            'Venezuela', 'Bolivarian Republic of Venezuela'
+        ]);
+
+        const hasStarlinkBanned = (feature: any): boolean => {
             if (!feature.properties) return false;
 
-            // Controlla vari campi nome che potrebbero contenere il nome del paese/stato
             const possibleNames = [
                 feature.properties.name,
                 feature.properties.NAME,
@@ -40,269 +52,10 @@ const GlobeComponent: React.FC = () => {
                 feature.properties.NAME_LONG
             ].filter(Boolean);
 
-            // Per gli stati USA, controlla separatamente
-            if (feature.properties.type === 'state' ||
-                possibleNames.some(name => starlinkActiveUSStates.has(name))) {
-                return true;
-            }
-
-            // Per i paesi, controlla la lista principale
-            return possibleNames.some(name => starlinkActiveCountries.has(name));
+            return possibleNames.some(name => starlinkBannedCountries.has(name));
         };
 
-        // Lista aggiornata dei paesi dove Starlink è attivo (Agosto 2025)
-        const starlinkActiveCountries = new Set([
-            // Nord America
-            'United States', 'United States of America', 'USA', 'US', 'America',
-            'Canada',
-            'Mexico',
-
-            // Europa
-            'United Kingdom', 'UK', 'Britain', 'England', 'Scotland', 'Wales', 'Northern Ireland',
-            'Germany', 'Deutschland',
-            'France', 'República Francesa',
-            'Italy', 'Italia',
-            'Spain', 'España',
-            'Netherlands', 'Nederland',
-            'Poland', 'Polska',
-            'Belgium', 'België',
-            'Austria', 'Österreich',
-            'Switzerland', 'Schweiz',
-            'Ireland', 'Éire',
-            'Denmark', 'Danmark',
-            'Sweden', 'Sverige',
-            'Norway', 'Norge',
-            'Finland', 'Suomi',
-            'Portugal',
-            'Czech Republic', 'Czechia',
-            'Hungary', 'Magyarország',
-            'Slovakia', 'Slovensko',
-            'Slovenia', 'Slovenija',
-            'Croatia', 'Hrvatska',
-            'Lithuania', 'Lietuva',
-            'Latvia', 'Latvija',
-            'Estonia', 'Eesti',
-            'Greece', 'Ελλάδα',
-            'Romania', 'România',
-            'Bulgaria', 'България',
-            'Ukraine', 'Україна',
-
-            // Sud America
-            'Brazil', 'Brasil',
-            'Chile',
-            'Argentina',
-            'Colombia',
-            'Peru', 'Perú',
-            'Ecuador',
-            'Uruguay',
-            'Paraguay',
-            'Bolivia',
-
-            // Centro America & Caraibi
-            'Guatemala',
-            'Honduras',
-            'El Salvador',
-            'Nicaragua',
-            'Costa Rica',
-            'Panama', 'Panamá',
-            'Dominican Republic', 'República Dominicana',
-            'Jamaica',
-
-            // Asia-Pacifico
-            'Japan', 'Nippon', '日本',
-            'Australia',
-            'New Zealand', 'Aotearoa',
-            'Philippines', 'Pilipinas',
-            'Malaysia',
-            'Indonesia',
-            'Thailand', 'ประเทศไทย',
-            'Singapore',
-            'Mongolia',
-
-            // Africa
-            'Nigeria',
-            'Kenya',
-            'Rwanda',
-            'Mozambique',
-            'Malawi',
-            'Zambia',
-            'Zimbabwe',
-            'Ghana',
-            'South Sudan',
-            'Somalia',
-            'Botswana',
-            'Eswatini', 'Swaziland',
-            'Benin',
-            'Mauritius',
-            'Madagascar',
-            'Angola',
-            'Democratic Republic of the Congo', 'DRC', 'Congo (Kinshasa)',
-
-            // Medio Oriente
-            'Israel', 'ישראל',
-            'Qatar',
-            'Bahrain',
-            'Oman',
-            'Jordan', 'الأردن',
-            'Yemen',
-            'Kuwait',
-
-            // Isole e Territori
-            'Fiji',
-            'Tonga',
-            'Samoa',
-            'Solomon Islands',
-            'Vanuatu',
-            'Cook Islands',
-            'French Polynesia',
-            'Greenland', 'Grønland',
-            'Faroe Islands', 'Føroyar',
-            'Iceland', 'Ísland',
-            'Puerto Rico',
-            'US Virgin Islands',
-            'Guam',
-            'American Samoa',
-            'Easter Island'
-        ]);
-
-        // Lista degli stati USA (per copertura più dettagliata)
-        const starlinkActiveUSStates = new Set([
-            'California', 'Texas', 'Florida', 'New York', 'Pennsylvania', 'Illinois', 'Ohio',
-            'Georgia', 'North Carolina', 'Michigan', 'New Jersey', 'Virginia', 'Washington',
-            'Arizona', 'Massachusetts', 'Tennessee', 'Indiana', 'Missouri', 'Maryland',
-            'Wisconsin', 'Colorado', 'Minnesota', 'South Carolina', 'Alabama', 'Louisiana',
-            'Kentucky', 'Oregon', 'Oklahoma', 'Connecticut', 'Utah', 'Iowa', 'Nevada',
-            'Arkansas', 'Mississippi', 'Kansas', 'New Mexico', 'Nebraska', 'West Virginia',
-            'Idaho', 'Hawaii', 'New Hampshire', 'Maine', 'Montana', 'Rhode Island',
-            'Delaware', 'South Dakota', 'North Dakota', 'Alaska', 'Vermont', 'Wyoming'
-        ]);
-
         const createCleanSpaceSkybox = () => {
-            const starlinkActiveCountries = new Set([
-                // Nord America
-                'United States', 'United States of America', 'USA', 'US', 'America',
-                'Canada',
-                'Mexico',
-
-                // Europa
-                'United Kingdom', 'UK', 'Britain', 'England', 'Scotland', 'Wales', 'Northern Ireland',
-                'Germany', 'Deutschland',
-                'France', 'República Francesa',
-                'Italy', 'Italia',
-                'Spain', 'España',
-                'Netherlands', 'Nederland',
-                'Poland', 'Polska',
-                'Belgium', 'België',
-                'Austria', 'Österreich',
-                'Switzerland', 'Schweiz',
-                'Ireland', 'Éire',
-                'Denmark', 'Danmark',
-                'Sweden', 'Sverige',
-                'Norway', 'Norge',
-                'Finland', 'Suomi',
-                'Portugal',
-                'Czech Republic', 'Czechia',
-                'Hungary', 'Magyarország',
-                'Slovakia', 'Slovensko',
-                'Slovenia', 'Slovenija',
-                'Croatia', 'Hrvatska',
-                'Lithuania', 'Lietuva',
-                'Latvia', 'Latvija',
-                'Estonia', 'Eesti',
-                'Greece', 'Ελλάδα',
-                'Romania', 'România',
-                'Bulgaria', 'България',
-                'Ukraine', 'Україна',
-
-                // Sud America
-                'Brazil', 'Brasil',
-                'Chile',
-                'Argentina',
-                'Colombia',
-                'Peru', 'Perú',
-                'Ecuador',
-                'Uruguay',
-                'Paraguay',
-                'Bolivia',
-
-                // Centro America & Caraibi
-                'Guatemala',
-                'Honduras',
-                'El Salvador',
-                'Nicaragua',
-                'Costa Rica',
-                'Panama', 'Panamá',
-                'Dominican Republic', 'República Dominicana',
-                'Jamaica',
-
-                // Asia-Pacifico
-                'Japan', 'Nippon', '日本',
-                'Australia',
-                'New Zealand', 'Aotearoa',
-                'Philippines', 'Pilipinas',
-                'Malaysia',
-                'Indonesia',
-                'Thailand', 'ประเทศไทย',
-                'Singapore',
-                'Mongolia',
-
-                // Africa
-                'Nigeria',
-                'Kenya',
-                'Rwanda',
-                'Mozambique',
-                'Malawi',
-                'Zambia',
-                'Zimbabwe',
-                'Ghana',
-                'South Sudan',
-                'Somalia',
-                'Botswana',
-                'Eswatini', 'Swaziland',
-                'Benin',
-                'Mauritius',
-                'Madagascar',
-                'Angola',
-                'Democratic Republic of the Congo', 'DRC', 'Congo (Kinshasa)',
-
-                // Medio Oriente
-                'Israel', 'ישראל',
-                'Qatar',
-                'Bahrain',
-                'Oman',
-                'Jordan', 'الأردن',
-                'Yemen',
-                'Kuwait',
-
-                // Isole e Territori
-                'Fiji',
-                'Tonga',
-                'Samoa',
-                'Solomon Islands',
-                'Vanuatu',
-                'Cook Islands',
-                'French Polynesia',
-                'Greenland', 'Grønland',
-                'Faroe Islands', 'Føroyar',
-                'Iceland', 'Ísland',
-                'Puerto Rico',
-                'US Virgin Islands',
-                'Guam',
-                'American Samoa',
-                'Easter Island'
-            ]);
-
-            // Lista degli stati USA (per copertura più dettagliata)
-            const starlinkActiveUSStates = new Set([
-                'California', 'Texas', 'Florida', 'New York', 'Pennsylvania', 'Illinois', 'Ohio',
-                'Georgia', 'North Carolina', 'Michigan', 'New Jersey', 'Virginia', 'Washington',
-                'Arizona', 'Massachusetts', 'Tennessee', 'Indiana', 'Missouri', 'Maryland',
-                'Wisconsin', 'Colorado', 'Minnesota', 'South Carolina', 'Alabama', 'Louisiana',
-                'Kentucky', 'Oregon', 'Oklahoma', 'Connecticut', 'Utah', 'Iowa', 'Nevada',
-                'Arkansas', 'Mississippi', 'Kansas', 'New Mexico', 'Nebraska', 'West Virginia',
-                'Idaho', 'Hawaii', 'New Hampshire', 'Maine', 'Montana', 'Rhode Island',
-                'Delaware', 'South Dakota', 'North Dakota', 'Alaska', 'Vermont', 'Wyoming'
-            ]);
             const skyboxGeometry = new THREE.SphereGeometry(1000, 60, 40);
 
             const canvas = document.createElement('canvas');
@@ -428,14 +181,11 @@ const GlobeComponent: React.FC = () => {
             return new THREE.Vector3(x, y, z);
         };
 
-        // Funzione per caricare i dati geografici
         const loadGeographicData = async () => {
             try {
-                // Prima carica i paesi del mondo (escludendo gli USA)
                 const worldResponse = await fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson');
                 const worldData = await worldResponse.json();
 
-                // Filtra i dati mondiali per escludere gli USA
                 const worldWithoutUSA = {
                     type: "FeatureCollection",
                     features: worldData.features.filter((feature: any) =>
@@ -447,7 +197,6 @@ const GlobeComponent: React.FC = () => {
 
                 console.log('Paesi mondiali caricati (senza USA):', worldWithoutUSA.features.length);
 
-                // Poi carica gli stati USA separatamente
                 let usStatesData = null;
                 const usStateUrls = [
                     'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json',
@@ -463,10 +212,8 @@ const GlobeComponent: React.FC = () => {
                         if (response.ok) {
                             const data = await response.json();
 
-                            // Controlla se è TopoJSON o GeoJSON
                             if (data.type === 'Topology') {
                                 console.log('Formato TopoJSON rilevato, conversione necessaria');
-                                // Per ora salta i TopoJSON, prova il prossimo URL
                                 continue;
                             } else if (data.type === 'FeatureCollection') {
                                 usStatesData = data;
@@ -479,14 +226,11 @@ const GlobeComponent: React.FC = () => {
                     }
                 }
 
-                // Se non riesce a caricare gli stati USA, usa un GeoJSON hardcoded semplificato
                 if (!usStatesData) {
                     console.log('Usando fallback per stati USA...');
-                    // Questo è un fallback con coordinate semplici per alcuni stati principali
                     usStatesData = {
                         type: "FeatureCollection",
                         features: [
-                            // California (semplificato)
                             {
                                 type: "Feature",
                                 properties: { name: "California", type: "state" },
@@ -498,7 +242,6 @@ const GlobeComponent: React.FC = () => {
                                     ]]
                                 }
                             },
-                            // Texas (semplificato)
                             {
                                 type: "Feature",
                                 properties: { name: "Texas", type: "state" },
@@ -510,7 +253,6 @@ const GlobeComponent: React.FC = () => {
                                     ]]
                                 }
                             },
-                            // Florida (semplificato)
                             {
                                 type: "Feature",
                                 properties: { name: "Florida", type: "state" },
@@ -522,7 +264,6 @@ const GlobeComponent: React.FC = () => {
                                     ]]
                                 }
                             },
-                            // New York (semplificato)
                             {
                                 type: "Feature",
                                 properties: { name: "New York", type: "state" },
@@ -538,24 +279,19 @@ const GlobeComponent: React.FC = () => {
                     };
                 }
 
-                // Combina mondo + stati USA
                 const combinedGeoData = {
                     type: "FeatureCollection",
                     features: [...worldWithoutUSA.features, ...usStatesData.features]
                 };
 
                 return combinedGeoData;
-
-                return combinedGeoData;
             } catch (error) {
                 console.error('Errore nel caricamento dei dati geografici:', error);
-                // Fallback finale al GeoJSON originale
                 const response = await fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson');
                 return await response.json();
             }
         };
 
-        // Funzione per disegnare i confini geografici
         const drawGeographicBorders = (geoData: any) => {
             if (!geoData || !geoData.features) {
                 console.error('Dati GeoJSON non validi');
@@ -564,85 +300,99 @@ const GlobeComponent: React.FC = () => {
 
             console.log('Funzioni geografiche da disegnare:', geoData.features.length);
 
-            geoData.features.forEach((feature: any, index: number) => {
-                if (!feature.geometry || !feature.geometry.coordinates) return;
+            const bannedFeatures: any[] = [];
+            const normalFeatures: any[] = [];
 
-                // Debug: stampa info sulla feature
-                if (index < 5) {
-                    console.log(`Feature ${index}:`, {
-                        name: feature.properties?.name || feature.properties?.NAME || feature.properties?.ADMIN,
-                        type: feature.properties?.type,
-                        geometryType: feature.geometry.type
-                    });
+            geoData.features.forEach((feature: any) => {
+                if (hasStarlinkBanned(feature)) {
+                    bannedFeatures.push(feature);
+                } else {
+                    normalFeatures.push(feature);
                 }
-
-                const coordinates = feature.geometry.type === 'Polygon'
-                    ? [feature.geometry.coordinates]
-                    : feature.geometry.coordinates;
-
-                coordinates.forEach((polygon: any) => {
-                    if (!polygon || !polygon[0]) return;
-
-                    const ring = polygon[0];
-                    const points: THREE.Vector3[] = ring.map((coord: [number, number]) => {
-                        const [lon, lat] = coord;
-                        const phi = (90 - lat) * Math.PI / 180;
-                        const theta = -lon * Math.PI / 180;
-                        const radius = 5.01;
-                        const x = radius * Math.sin(phi) * Math.cos(theta);
-                        const y = radius * Math.cos(phi);
-                        const z = radius * Math.sin(phi) * Math.sin(theta);
-                        return new THREE.Vector3(x, y, z);
-                    });
-
-                    if (points.length > 0) {
-                        points.push(points[0]); // Chiudi il poligono
-
-                        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-                        // Determina il colore in base alla copertura Starlink
-                        let lineColor = 0xcccccc; // Grigio per paesi senza Starlink
-                        let lineWidth = 1;
-
-                        if (feature.properties) {
-                            const hasStarlink = hasStarlinkCoverage(feature);
-
-                            if (hasStarlink) {
-                                lineColor = 0x00ff00; // Verde per paesi/stati con Starlink
-                                lineWidth = 2;
-
-                                // Log per debug
-                                const displayName = feature.properties.name ||
-                                    feature.properties.NAME ||
-                                    feature.properties.ADMIN ||
-                                    'Unknown';
-                                console.log('Starlink attivo trovato:', displayName);
-                            } else {
-                                // Stati USA senza Starlink (in rosso per distinguere)
-                                if (feature.properties.type === 'state') {
-                                    lineColor = 0xff6666; // Rosso per stati USA senza Starlink
-                                }
-                                // Altri paesi restano grigi
-                            }
-                        }
-
-                        const lineMaterial = new THREE.LineBasicMaterial({
-                            color: lineColor,
-                            opacity: 0.8,
-                            transparent: true,
-                            linewidth: lineWidth
-                        });
-                        const borderLine = new THREE.Line(geometry, lineMaterial);
-                        scene.add(borderLine);
-                    }
-                });
             });
+
+            const drawFeatures = (features: any[], isBanned: boolean) => {
+                features.forEach((feature: any, index: number) => {
+                    if (!feature.geometry || !feature.geometry.coordinates) return;
+
+                    const coordinates = feature.geometry.type === 'Polygon'
+                        ? [feature.geometry.coordinates]
+                        : feature.geometry.coordinates;
+
+                    coordinates.forEach((polygon: any) => {
+                        if (!polygon || !polygon[0]) return;
+
+                        const ring = polygon[0];
+                        const points: THREE.Vector3[] = ring.map((coord: [number, number]) => {
+                            const [lon, lat] = coord;
+                            const phi = (90 - lat) * Math.PI / 180;
+                            const theta = -lon * Math.PI / 180;
+                            const radius = 5.01;
+                            const x = radius * Math.sin(phi) * Math.cos(theta);
+                            const y = radius * Math.cos(phi);
+                            const z = radius * Math.sin(phi) * Math.sin(theta);
+                            return new THREE.Vector3(x, y, z);
+                        });
+
+                        if (points.length > 0) {
+                            points.push(points[0]);
+
+                            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+                            let lineColor: number;
+                            let lineWidth = 1;
+                            let opacity = 0.8;
+
+                            if (isBanned) {
+                                lineColor = 0xff0000;
+                                lineWidth = 3;
+                                opacity = 1.0;
+
+                                const displayName = feature.properties?.name ||
+                                    feature.properties?.NAME ||
+                                    feature.properties?.ADMIN ||
+                                    'Unknown';
+                                console.log('🔴 Starlink vietato:', displayName);
+                            } else {
+                                lineColor = 0xffffff;
+                                lineWidth = 1;
+                                opacity = 0.6;
+                            }
+
+                            const lineMaterial = new THREE.LineBasicMaterial({
+                                color: lineColor,
+                                opacity: opacity,
+                                transparent: true,
+                                linewidth: lineWidth,
+                                depthWrite: isBanned ? true : false,
+                                depthTest: true
+                            });
+
+                            const borderLine = new THREE.Line(geometry, lineMaterial);
+
+                            if (isBanned) {
+                                borderLine.position.setLength(borderLine.position.length() * 1.01);
+                                borderLine.renderOrder = 1000;
+                            } else {
+                                borderLine.renderOrder = 0;
+                            }
+
+                            scene.add(borderLine);
+                        }
+                    });
+                });
+            };
+
+            console.log('Disegnando paesi normali:', normalFeatures.length);
+            drawFeatures(normalFeatures, false);
+
+            console.log('Disegnando paesi banned:', bannedFeatures.length);
+            drawFeatures(bannedFeatures, true);
         };
 
-        // Carica i dati geografici e disegna i confini
         loadGeographicData().then((geoData) => {
             drawGeographicBorders(geoData);
-            // Dopo aver caricato i confini, carica i satelliti
+
             const celestrakUrl = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle';
             fetch(`https://corsproxy.io/?${encodeURIComponent(celestrakUrl)}`)
                 .then(response => response.text())
@@ -688,7 +438,7 @@ const GlobeComponent: React.FC = () => {
                     const geometry = new THREE.BufferGeometry();
                     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
                     const material = new THREE.PointsMaterial({
-                        color: 0xffa500,
+                        color: 0x00ff00,
                         size: 0.03,
                         map: createCircleTexture(),
                         transparent: true,
