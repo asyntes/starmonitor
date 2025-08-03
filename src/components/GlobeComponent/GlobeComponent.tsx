@@ -19,97 +19,53 @@ const GlobeComponent: React.FC = () => {
         const currentMount = mountRef.current;
         if (!currentMount) return;
 
-        // Inizializza scena, camera e renderer
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         currentMount.appendChild(renderer.domElement);
 
-        // Crea skybox minimalista e pulita stile satellitemap.space
         const createCleanSpaceSkybox = () => {
             const skyboxGeometry = new THREE.SphereGeometry(1000, 60, 40);
 
-            // Crea texture minimalista e pulita
             const canvas = document.createElement('canvas');
             canvas.width = 2048;
             canvas.height = 1024;
             const ctx = canvas.getContext('2d');
 
             if (ctx) {
-                // Sfondo gradiente spazio profondo molto sottile
-                const gradient = ctx.createLinearGradient(0, 0, 0, 1024);
-                gradient.addColorStop(0, '#0a0a0f');
-                gradient.addColorStop(0.5, '#000000');
-                gradient.addColorStop(1, '#0a0a0f');
-
-                ctx.fillStyle = gradient;
+                ctx.fillStyle = '#000000';
                 ctx.fillRect(0, 0, 2048, 1024);
 
-                // Stelle minimaliste e sparse
                 ctx.fillStyle = '#ffffff';
-                for (let i = 0; i < 800; i++) {
-                    const x = Math.random() * 2048;
-                    const y = Math.random() * 1024;
+
+                for (let i = 0; i < 4000; i++) {
+                    const x = Math.floor(Math.random() * 2048);
+                    const y = Math.floor(Math.random() * 1024);
                     const brightness = Math.random();
 
-                    if (brightness > 0.98) {
-                        // Stelle molto luminose (rare)
-                        ctx.globalAlpha = 0.9;
+                    if (brightness > 0.999) {
+                        ctx.globalAlpha = 0.4;
                         ctx.beginPath();
-                        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                        ctx.arc(x + 0.5, y + 0.5, 0.02, 0, Math.PI * 2);
                         ctx.fill();
-                    } else if (brightness > 0.9) {
-                        // Stelle luminose
-                        ctx.globalAlpha = 0.7;
+                    } else if (brightness > 0.995) {
+                        ctx.globalAlpha = 0.25;
                         ctx.beginPath();
-                        ctx.arc(x, y, 1, 0, Math.PI * 2);
+                        ctx.arc(x + 0.5, y + 0.5, 0.015, 0, Math.PI * 2);
                         ctx.fill();
-                    } else if (brightness > 0.7) {
-                        // Stelle normali
-                        ctx.globalAlpha = 0.5;
-                        ctx.beginPath();
-                        ctx.arc(x, y, 0.5, 0, Math.PI * 2);
-                        ctx.fill();
+                    } else {
+                        ctx.globalAlpha = Math.random() * 0.15 + 0.05;
+                        ctx.fillRect(x, y, 1, 1);
                     }
                 }
 
-                // Via Lattea molto sottile e discreta
-                ctx.globalAlpha = 0.15;
-                const milkyWayY = 512;
-                const milkyWayHeight = 80;
-
-                const milkyWayGradient = ctx.createLinearGradient(0, milkyWayY - milkyWayHeight / 2, 0, milkyWayY + milkyWayHeight / 2);
-                milkyWayGradient.addColorStop(0, 'transparent');
-                milkyWayGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
-                milkyWayGradient.addColorStop(1, 'transparent');
-
-                ctx.fillStyle = milkyWayGradient;
-                ctx.fillRect(0, milkyWayY - milkyWayHeight / 2, 2048, milkyWayHeight);
-
-                // Qualche stella più luminosa sparsa
-                const brightStars = [
-                    { x: 400, y: 200 },
-                    { x: 800, y: 700 },
-                    { x: 1200, y: 300 },
-                    { x: 1600, y: 800 },
-                    { x: 300, y: 600 }
-                ];
-
-                ctx.globalAlpha = 0.8;
-                ctx.fillStyle = '#ffffff';
-                brightStars.forEach(star => {
-                    ctx.beginPath();
-                    ctx.arc(star.x, star.y, 2, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Bagliore sottile
-                    ctx.globalAlpha = 0.3;
-                    ctx.beginPath();
-                    ctx.arc(star.x, star.y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.globalAlpha = 0.8;
-                });
+                for (let i = 0; i < 2000; i++) {
+                    const x = Math.floor(Math.random() * 2048);
+                    const y = Math.floor(Math.random() * 1024);
+                    ctx.globalAlpha = Math.random() * 0.05 + 0.01;
+                    ctx.fillRect(x, y, 1, 1);
+                }
             }
 
             const texture = new THREE.CanvasTexture(canvas);
@@ -125,23 +81,19 @@ const GlobeComponent: React.FC = () => {
             scene.add(skybox);
 
             scene.background = texture;
-            console.log('Skybox pulita stile satellitemap.space creata');
+            console.log('Skybox con stelline ultra-minuscole creata');
         };
 
-        // Crea la skybox pulita e minimalista
         createCleanSpaceSkybox();
 
-        // Aggiungi luci per profondità
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(5, 3, 5);
         scene.add(directionalLight);
 
-        // Loader per texture
         const loader = new THREE.TextureLoader();
 
-        // Carica texture principale e normal map per rilievi
         loader.load(
             'https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg',
             (texture) => {
@@ -163,7 +115,6 @@ const GlobeComponent: React.FC = () => {
             (error) => console.error('Errore caricamento texture:', error)
         );
 
-        // Funzione per creare texture circolare
         const createCircleTexture = () => {
             const canvas = document.createElement('canvas');
             canvas.width = 16;
@@ -178,7 +129,6 @@ const GlobeComponent: React.FC = () => {
             return new THREE.CanvasTexture(canvas);
         };
 
-        // Funzione per calcolare la posizione del satellite
         const getSatellitePosition = (satrec: any, date: Date): THREE.Vector3 | null => {
             const positionAndVelocity = satellite.propagate(satrec, date) as PositionAndVelocity | boolean;
             if (typeof positionAndVelocity !== 'object' || !positionAndVelocity || !positionAndVelocity.position) {
@@ -201,7 +151,6 @@ const GlobeComponent: React.FC = () => {
             return new THREE.Vector3(x, y, z);
         };
 
-        // Fetch GeoJSON e rendering confini come linee
         fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson')
             .then(response => response.json())
             .then((data: any) => {
@@ -233,12 +182,10 @@ const GlobeComponent: React.FC = () => {
                     });
                 });
 
-                // Fetch real-time TLE da Celestrak con proxy CORS
                 const celestrakUrl = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle';
                 fetch(`https://corsproxy.io/?${encodeURIComponent(celestrakUrl)}`)
                     .then(response => response.text())
                     .then(tleText => {
-                        // Parse TLE text in array
                         const lines = tleText.trim().split('\n');
                         const starlinkTLEs = [];
                         for (let i = 0; i < lines.length; i += 3) {
@@ -252,7 +199,6 @@ const GlobeComponent: React.FC = () => {
                         }
                         console.log('TLE Starlink fetchati:', starlinkTLEs.length);
 
-                        // Usa tutti i TLE, rappresentati come punti per efficienza
                         let posArray: number[] = [];
                         let satrecs: any[] = [];
                         starlinkTLEs.forEach((sat) => {
@@ -272,19 +218,17 @@ const GlobeComponent: React.FC = () => {
                             }
                         });
 
-                        // Aggiorna il contatore dei satelliti
                         setSatelliteCount(satrecs.length);
                         setIsLoading(false);
 
                         console.log('Satelliti plottati:', satrecs.length);
 
-                        // Crea un singolo oggetto Points per tutti i satelliti
                         const positions = new Float32Array(posArray);
                         const geometry = new THREE.BufferGeometry();
                         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
                         const material = new THREE.PointsMaterial({
                             color: 0xffa500,
-                            size: 0.05,
+                            size: 0.03,
                             map: createCircleTexture(),
                             transparent: true,
                             alphaTest: 0.5
@@ -292,7 +236,6 @@ const GlobeComponent: React.FC = () => {
                         const points = new THREE.Points(geometry, material);
                         scene.add(points);
 
-                        // Aggiornamento real-time ogni secondo
                         const interval = setInterval(() => {
                             const date = new Date();
                             let activeCount = 0;
@@ -306,7 +249,6 @@ const GlobeComponent: React.FC = () => {
                                 }
                             });
                             geometry.attributes.position.needsUpdate = true;
-                            // Aggiorna il contatore se necessario
                             setSatelliteCount(activeCount);
                         }, 1000);
 
@@ -324,7 +266,6 @@ const GlobeComponent: React.FC = () => {
 
         camera.position.z = 10;
 
-        // Aggiungi controlli interattivi
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
@@ -333,12 +274,10 @@ const GlobeComponent: React.FC = () => {
         controls.maxDistance = 20;
         controls.enablePan = false;
 
-        // Funzione di animazione
         let animationFrameId: number;
         const animate = () => {
             animationFrameId = requestAnimationFrame(animate);
 
-            // Rotazione lenta del globo
             scene.rotation.y += 0.001;
 
             controls.update();
@@ -346,7 +285,6 @@ const GlobeComponent: React.FC = () => {
         };
         animate();
 
-        // Gestisci ridimensionamento finestra
         const handleResize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -354,7 +292,6 @@ const GlobeComponent: React.FC = () => {
         };
         window.addEventListener('resize', handleResize);
 
-        // Cleanup
         return () => {
             window.removeEventListener('resize', handleResize);
             if (currentMount) {
