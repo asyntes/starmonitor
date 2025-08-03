@@ -1,6 +1,6 @@
 .satellite-counter {
     position: fixed;
-    bottom: calc(2vh + 120px);
+    bottom: 25vh;
     /* Alzato sopra la legend */
     right: 2vw;
     background: rgba(0, 0, 0, 0.7);
