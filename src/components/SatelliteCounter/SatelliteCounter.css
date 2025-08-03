@@ -1,7 +1,6 @@
 .satellite-counter {
     position: fixed;
     bottom: 25vh;
-    /* Alzato sopra la legend */
     right: 2vw;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
@@ -92,7 +91,6 @@
 @media screen and (max-width: 768px) {
     .satellite-counter {
         bottom: calc(1vh + 110px);
-        /* Alzato sopra la legend */
         left: 2vw;
         right: 2vw;
         width: calc(100vw - 4vw);
@@ -127,7 +125,6 @@
 @media screen and (max-width: 480px) {
     .satellite-counter {
         bottom: calc(0.5vh + 100px);
-        /* Alzato sopra la legend */
         left: 2vw;
         right: 2vw;
         width: calc(100vw - 4vw);

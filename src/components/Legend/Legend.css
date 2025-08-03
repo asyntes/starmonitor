@@ -85,16 +85,12 @@
 @media screen and (max-width: 768px) {
     .service-legend {
         bottom: 3vh;
-        /* SOTTO il SatelliteCounter su mobile che è a 1vh */
         left: 2vw;
         right: 2vw;
         width: calc(100vw - 4vw);
         padding: 1rem 1.5rem;
-        /* Stesso padding del counter */
         font-size: clamp(14px, 2vw, 16px);
-        /* Stesso font-size del counter */
         border-radius: 0;
-        /* Stesso border-radius del counter */
         text-align: center;
         margin: 0 auto;
         box-sizing: border-box;
@@ -124,14 +120,11 @@
 
     .legend-title {
         font-size: clamp(12px, 1.8vw, 14px);
-        /* Stesso del counter-label */
         margin-bottom: 0.3rem;
-        /* Stesso del counter */
     }
 
     .legend-label {
         font-size: clamp(10px, 1.5vw, 12px);
-        /* Stesso del counter-status */
     }
 }
 
@@ -139,16 +132,12 @@
 @media screen and (max-width: 480px) {
     .service-legend {
         bottom: 3vh;
-        /* SOTTO il SatelliteCounter su mobile piccolo che è a 0.5vh */
         left: 2vw;
         right: 2vw;
         width: calc(100vw - 4vw);
         padding: 0.8rem 1.2rem;
-        /* Stesso padding del counter */
         font-size: clamp(13px, 2.2vw, 15px);
-        /* Stesso font-size del counter */
         border-radius: 0;
-        /* Stesso border-radius del counter */
         text-align: center;
         margin: 0 auto;
         box-sizing: border-box;
@@ -169,11 +158,9 @@
 
     .legend-title {
         font-size: clamp(11px, 1.9vw, 13px);
-        /* Stesso del counter-label */
     }
 
     .legend-label {
         font-size: clamp(9px, 1.6vw, 11px);
-        /* Stesso del counter-status */
     }
 }
