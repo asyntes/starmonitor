@@ -23,7 +23,7 @@ export const useThreeScene = (
         controls.screenSpacePanning = false;
         controls.minDistance = 7;
         controls.maxDistance = 20;
-        //controls.enablePan = false;
+        controls.enablePan = false;
 
         renderer.setSize(window.innerWidth, window.innerHeight);
         currentMount.appendChild(renderer.domElement);
