@@ -35,12 +35,27 @@ export const useThreeScene = (
         const initialBackwardRotation = -0.35;
         scene.rotation.y = initialBackwardRotation;
 
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-            scene.position.y = 2.7;
-            controls.minDistance = 10;
+        const isMobileViewport = () => {
+            const aspectRatio = window.innerWidth / window.innerHeight;
+            return window.innerWidth <= 768 || (window.innerWidth <= 1024 && aspectRatio < 1.2);
+        };
+
+        const setupCameraAndScene = () => {
+            if (isMobileViewport()) {
+                scene.position.y = 2.7;
+                camera.position.z = 15;
+                camera.position.y = 2;
+                controls.minDistance = 10;
+            } else {
+                scene.position.y = 0;
+                camera.position.z = 10;
+                camera.position.y = 2;
+                controls.minDistance = 7;
+            }
             controls.update();
-        }
+        };
+
+        setupCameraAndScene();
 
         let isAutoRotating = true;
         let isUserInteracting = false;
@@ -83,14 +98,6 @@ export const useThreeScene = (
                 });
         });
 
-        if (window.innerWidth <= 768) {
-            camera.position.z = 15;
-            camera.position.y = 2;
-        } else {
-            camera.position.z = 10;
-            camera.position.y = 2;
-        }
-
         controls.addEventListener('start', () => {
             isUserInteracting = true;
             isAutoRotating = false;
@@ -126,21 +133,14 @@ export const useThreeScene = (
 
         const handleResize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
-
-            const newIsMobile = window.innerWidth <= 768;
-            if (newIsMobile) {
-                scene.position.y = 7;
-                camera.position.z = 15;
-                camera.position.y = 2;
-            } else {
-                scene.position.y = 0;
-                camera.position.z = 10;
-                camera.position.y = 2;
-            }
-
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+
+            if (!isUserInteracting) {
+                setupCameraAndScene();
+            }
         };
+
         window.addEventListener('resize', handleResize);
 
         return () => {
