@@ -25,6 +25,9 @@ export const useThreeScene = (
         setupLighting(scene);
         createEarth(scene);
 
+        const initialBackwardRotation = -0.35;
+        scene.rotation.y = initialBackwardRotation;
+
         let isAutoRotating = true;
 
         loadGeographicData().then((geoData) => {
@@ -63,8 +66,13 @@ export const useThreeScene = (
                 });
         });
 
-        // Adjust camera zoom based on screen size
-        camera.position.z = window.innerWidth <= 768 ? 15 : 10; // Zoom out more on mobile
+        if (window.innerWidth <= 768) {
+            camera.position.z = 15;
+            camera.position.y = 2;
+        } else {
+            camera.position.z = 10;
+            camera.position.y = 2;
+        }
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -93,7 +101,15 @@ export const useThreeScene = (
 
         const handleResize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
-            camera.position.z = window.innerWidth <= 768 ? 15 : 10; // Update zoom on resize
+
+            if (window.innerWidth <= 768) {
+                camera.position.z = 15;
+                camera.position.y = 2;
+            } else {
+                camera.position.z = 10;
+                camera.position.y = 2;
+            }
+
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         };

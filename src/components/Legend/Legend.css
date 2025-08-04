@@ -1,6 +1,6 @@
 .service-legend {
     position: fixed;
-    bottom: calc(2vh + 120px);
+    bottom: 5vh;
     /* Sotto il SatelliteCounter */
     right: 2vw;
     background: rgba(0, 0, 0, 0.7);
@@ -19,6 +19,7 @@
     transition: all 0.3s ease;
     max-width: 90vw;
     box-sizing: border-box;
+    width: 14vw;
 }
 
 .service-legend:hover {
@@ -83,13 +84,12 @@
 /* Media query for smaller screens (e.g., mobile devices) */
 @media screen and (max-width: 768px) {
     .service-legend {
-        bottom: calc(1vh + 100px);
-        /* Sotto il SatelliteCounter su mobile */
+        bottom: 3vh;
         left: 2vw;
         right: 2vw;
         width: calc(100vw - 4vw);
-        padding: 0.8rem 1.2rem;
-        font-size: clamp(12px, 1.8vw, 14px);
+        padding: 1rem 1.5rem;
+        font-size: clamp(14px, 2vw, 16px);
         border-radius: 0;
         text-align: center;
         margin: 0 auto;
@@ -119,25 +119,24 @@
     }
 
     .legend-title {
-        font-size: clamp(11px, 1.5vw, 13px);
-        margin-bottom: 0.5rem;
+        font-size: clamp(12px, 1.8vw, 14px);
+        margin-bottom: 0.3rem;
     }
 
     .legend-label {
-        font-size: clamp(10px, 1.4vw, 12px);
+        font-size: clamp(10px, 1.5vw, 12px);
     }
 }
 
 /* Media query for very small screens (e.g., narrow mobile devices) */
 @media screen and (max-width: 480px) {
     .service-legend {
-        bottom: calc(0.5vh + 90px);
-        /* Sotto il SatelliteCounter su mobile piccolo */
+        bottom: 3vh;
         left: 2vw;
         right: 2vw;
         width: calc(100vw - 4vw);
-        padding: 0.7rem 1rem;
-        font-size: clamp(11px, 2vw, 13px);
+        padding: 0.8rem 1.2rem;
+        font-size: clamp(13px, 2.2vw, 15px);
         border-radius: 0;
         text-align: center;
         margin: 0 auto;
@@ -158,10 +157,10 @@
     }
 
     .legend-title {
-        font-size: clamp(10px, 1.6vw, 12px);
+        font-size: clamp(11px, 1.9vw, 13px);
     }
 
     .legend-label {
-        font-size: clamp(9px, 1.5vw, 11px);
+        font-size: clamp(9px, 1.6vw, 11px);
     }
 }
