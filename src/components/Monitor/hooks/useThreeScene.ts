@@ -28,6 +28,11 @@ export const useThreeScene = (
         const initialBackwardRotation = -0.35;
         scene.rotation.y = initialBackwardRotation;
 
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            scene.position.y = 2.2;
+        }
+
         let isAutoRotating = true;
 
         loadGeographicData().then((geoData) => {
@@ -102,10 +107,13 @@ export const useThreeScene = (
         const handleResize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
 
-            if (window.innerWidth <= 768) {
+            const newIsMobile = window.innerWidth <= 768;
+            if (newIsMobile) {
+                scene.position.y = 2.2;
                 camera.position.z = 15;
                 camera.position.y = 2;
             } else {
+                scene.position.y = 0;
                 camera.position.z = 10;
                 camera.position.y = 2;
             }
