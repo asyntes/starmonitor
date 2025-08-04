@@ -45,23 +45,43 @@ export const createCircleTexture = (): THREE.CanvasTexture => {
 
 export const fetchTLEData = async (): Promise<any[]> => {
     const celestrakUrl = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle';
-    const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(celestrakUrl)}`);
-    const tleText = await response.text();
 
-    const lines = tleText.trim().split('\n');
-    const starlinkTLEs = [];
+    let finalUrl: string;
 
-    for (let i = 0; i < lines.length; i += 3) {
-        if (lines[i] && lines[i + 1] && lines[i + 2]) {
-            starlinkTLEs.push({
-                name: lines[i].trim(),
-                tleLine1: lines[i + 1].trim(),
-                tleLine2: lines[i + 2].trim(),
-            });
-        }
+    // In development: use CORS proxy
+    // In production: use direct HTTPS URL (this code block gets removed in production build)
+    if (import.meta.env.DEV) {
+        finalUrl = `https://corsproxy.io/?${encodeURIComponent(celestrakUrl)}`;
+    } else {
+        finalUrl = celestrakUrl;
     }
 
-    return starlinkTLEs;
+    try {
+        const response = await fetch(finalUrl);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const tleText = await response.text();
+        const lines = tleText.trim().split('\n');
+        const starlinkTLEs = [];
+
+        for (let i = 0; i < lines.length; i += 3) {
+            if (lines[i] && lines[i + 1] && lines[i + 2]) {
+                starlinkTLEs.push({
+                    name: lines[i].trim(),
+                    tleLine1: lines[i + 1].trim(),
+                    tleLine2: lines[i + 2].trim(),
+                });
+            }
+        }
+
+        return starlinkTLEs;
+    } catch (error) {
+        console.error('Error fetching TLE data:', error);
+        throw new Error('Failed to fetch TLE data');
+    }
 };
 
 export const createSatellitePoints = (scene: THREE.Scene, tleData: any[]) => {

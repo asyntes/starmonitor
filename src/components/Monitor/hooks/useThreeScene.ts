@@ -43,6 +43,9 @@ export const useThreeScene = (
         }
 
         let isAutoRotating = true;
+        let isUserInteracting = false;
+        let lastInteractionTime = Date.now();
+        const INACTIVITY_TIMEOUT = 7000;
 
         loadGeographicData().then((geoData) => {
             drawGeographicBorders(scene, geoData);
@@ -88,10 +91,15 @@ export const useThreeScene = (
             camera.position.y = 2;
         }
 
-
-
-        controls.addEventListener('change', () => {
+        controls.addEventListener('start', () => {
+            isUserInteracting = true;
             isAutoRotating = false;
+            lastInteractionTime = Date.now();
+        });
+
+        controls.addEventListener('end', () => {
+            isUserInteracting = false;
+            lastInteractionTime = Date.now();
         });
 
         let animationFrameId: number;
@@ -99,9 +107,18 @@ export const useThreeScene = (
 
         const animate = () => {
             animationFrameId = requestAnimationFrame(animate);
-            if (isAutoRotating) {
+
+            if (!isAutoRotating && !isUserInteracting) {
+                const timeSinceLastInteraction = Date.now() - lastInteractionTime;
+                if (timeSinceLastInteraction > INACTIVITY_TIMEOUT) {
+                    isAutoRotating = true;
+                }
+            }
+
+            if (isAutoRotating && !isUserInteracting) {
                 scene.rotation.y += 0.001;
             }
+
             controls.update();
             renderer.render(scene, camera);
         };
