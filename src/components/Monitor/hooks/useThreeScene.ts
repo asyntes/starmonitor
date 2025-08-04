@@ -37,7 +37,7 @@ export const useThreeScene = (
 
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
-            scene.position.y = 2.2;
+            scene.position.y = 2.7;
             controls.minDistance = 10;
             controls.update();
         }
@@ -129,11 +129,9 @@ export const useThreeScene = (
 
             const newIsMobile = window.innerWidth <= 768;
             if (newIsMobile) {
-                scene.position.y = 2.2;
+                scene.position.y = 7;
                 camera.position.z = 15;
                 camera.position.y = 2;
-                controls.minDistance = 10;
-                controls.update();
             } else {
                 scene.position.y = 0;
                 camera.position.z = 10;
