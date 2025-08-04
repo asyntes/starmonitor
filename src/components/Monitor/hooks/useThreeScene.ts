@@ -17,6 +17,13 @@ export const useThreeScene = (
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer();
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 7;
+        controls.maxDistance = 20;
+        controls.enablePan = false;
 
         renderer.setSize(window.innerWidth, window.innerHeight);
         currentMount.appendChild(renderer.domElement);
@@ -31,6 +38,8 @@ export const useThreeScene = (
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
             scene.position.y = 2.2;
+            controls.minDistance = 10;
+            controls.update();
         }
 
         let isAutoRotating = true;
@@ -79,13 +88,7 @@ export const useThreeScene = (
             camera.position.y = 2;
         }
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.screenSpacePanning = false;
-        controls.minDistance = 7;
-        controls.maxDistance = 20;
-        controls.enablePan = false;
+
 
         controls.addEventListener('change', () => {
             isAutoRotating = false;
@@ -112,6 +115,8 @@ export const useThreeScene = (
                 scene.position.y = 2.2;
                 camera.position.z = 15;
                 camera.position.y = 2;
+                controls.minDistance = 10;
+                controls.update();
             } else {
                 scene.position.y = 0;
                 camera.position.z = 10;
