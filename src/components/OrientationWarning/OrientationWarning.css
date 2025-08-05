@@ -5,7 +5,7 @@
     width: 100vw;
     height: 100vh;
     background-color: #000000;
-    display: none;
+    /* Rimosso display: none - gestito via JavaScript inline style */
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -117,24 +117,7 @@
     }
 }
 
-@media screen and (max-width: 768px) and (orientation: landscape) {
-    .orientation-warning {
-        display: flex;
-    }
-}
-
-@media screen and (min-width: 769px) {
-    .orientation-warning {
-        display: none !important;
-    }
-}
-
-@media screen and (max-width: 768px) and (orientation: portrait) {
-    .orientation-warning {
-        display: none !important;
-    }
-}
-
+/* Media queries solo per il contenuto, non per la visibilità */
 @media screen and (max-width: 568px) and (orientation: landscape) {
     .orientation-content {
         gap: 1.5rem;
