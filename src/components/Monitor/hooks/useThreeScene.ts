@@ -26,6 +26,7 @@ export const useThreeScene = (
         controls.enablePan = false;
 
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         currentMount.appendChild(renderer.domElement);
 
         createCleanSpaceSkybox(scene);
@@ -132,19 +133,25 @@ export const useThreeScene = (
         animate();
 
         const handleResize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            // Piccolo delay per assicurarsi che le dimensioni siano aggiornate
+            setTimeout(() => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            if (!isUserInteracting) {
-                setupCameraAndScene();
-            }
+                if (!isUserInteracting) {
+                    setupCameraAndScene();
+                }
+            }, 100);
         };
 
         window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', handleResize);
 
         return () => {
             window.removeEventListener('resize', handleResize);
+            window.removeEventListener('orientationchange', handleResize);
             if (currentMount && renderer.domElement) {
                 currentMount.removeChild(renderer.domElement);
             }
