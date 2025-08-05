@@ -43,7 +43,6 @@
     font-size: 1.75rem;
     font-weight: bold;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    animation: pulse 2s ease-in-out infinite;
     margin: 0.25rem 0;
 }
 
