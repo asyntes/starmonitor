@@ -5,7 +5,6 @@
     width: 100vw;
     height: 100vh;
     background-color: #000000;
-    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -114,24 +113,6 @@
 
     75% {
         transform: rotate(15deg);
-    }
-}
-
-@media screen and (max-width: 768px) and (orientation: landscape) {
-    .orientation-warning {
-        display: flex;
-    }
-}
-
-@media screen and (min-width: 769px) {
-    .orientation-warning {
-        display: none !important;
-    }
-}
-
-@media screen and (max-width: 768px) and (orientation: portrait) {
-    .orientation-warning {
-        display: none !important;
     }
 }
 

@@ -2,38 +2,59 @@ import React, { useState, useEffect } from 'react';
 import './OrientationWarning.css';
 
 const OrientationWarning: React.FC = () => {
-    const [isLandscape, setIsLandscape] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+    const [shouldShowWarning, setShouldShowWarning] = useState(false);
 
     useEffect(() => {
         const checkOrientation = () => {
-            const isCurrentlyLandscape = window.innerWidth > window.innerHeight;
-            const isCurrentlyMobile = window.innerWidth <= 768;
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const isMobile = window.innerWidth <= 768 ||
+                (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) ||
+                ('ontouchstart' in window);
 
-            setIsLandscape(isCurrentlyLandscape);
-            setIsMobile(isCurrentlyMobile);
+            console.log('Orientation check:', {
+                isLandscape,
+                isMobile,
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+
+            setShouldShowWarning(isMobile && isLandscape);
         };
 
         checkOrientation();
 
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', () => {
-            // Piccolo delay per assicurarsi che le dimensioni siano aggiornate
+        const handleOrientationChange = () => {
             setTimeout(checkOrientation, 100);
+        };
+
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', handleOrientationChange);
+
+        if (screen && screen.orientation) {
+            screen.orientation.addEventListener('change', handleOrientationChange);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                checkOrientation();
+            }
         });
 
         return () => {
             window.removeEventListener('resize', checkOrientation);
-            window.removeEventListener('orientationchange', checkOrientation);
+            window.removeEventListener('orientationchange', handleOrientationChange);
+            if (screen && screen.orientation) {
+                screen.orientation.removeEventListener('change', handleOrientationChange);
+            }
+            document.removeEventListener('visibilitychange', checkOrientation);
         };
     }, []);
 
-    if (!isMobile || !isLandscape) {
-        return null;
-    }
-
     return (
-        <div className="orientation-warning">
+        <div
+            className="orientation-warning"
+            style={{ display: shouldShowWarning ? 'flex' : 'none' }}
+        >
             <div className="orientation-content">
                 <div className="orientation-icon">
                     <div className="phone-icon"></div>
