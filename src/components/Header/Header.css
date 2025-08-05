@@ -18,7 +18,7 @@
 }
 
 .main-title {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Nimbus', system-ui, sans-serif;
     font-size: clamp(1.8rem, 4vw, 2.5rem);
     font-weight: bold;
     color: #ffffff;
@@ -31,7 +31,7 @@
 }
 
 .subtitle {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Nimbus', system-ui, sans-serif;
     font-size: clamp(0.9rem, 2vw, 1.1rem);
     font-weight: 300;
     color: rgba(255, 255, 255, 0.8);

@@ -22,7 +22,7 @@
 }
 
 .loading-title {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Nimbus', system-ui, sans-serif;
     font-size: clamp(2.5rem, 6vw, 4rem);
     font-weight: bold;
     color: #ffffff;
@@ -36,7 +36,7 @@
 }
 
 .loading-subtitle {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Nimbus', system-ui, sans-serif;
     font-size: clamp(1rem, 2.5vw, 1.5rem);
     font-weight: 300;
     color: rgba(255, 255, 255, 0.8);
@@ -57,7 +57,7 @@
 }
 
 .loading-status {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Nimbus', system-ui, sans-serif;
     font-size: clamp(0.8rem, 1.5vw, 1rem);
     font-weight: 400;
     color: rgba(255, 255, 255, 0.6);

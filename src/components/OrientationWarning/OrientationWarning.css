@@ -72,7 +72,7 @@
 }
 
 .orientation-title {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Nimbus', system-ui, sans-serif;
     font-size: 1.5rem;
     font-weight: bold;
     color: #ffffff;
@@ -83,7 +83,7 @@
 }
 
 .orientation-message {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Nimbus', system-ui, sans-serif;
     font-size: 1rem;
     font-weight: 300;
     color: rgba(255, 255, 255, 0.8);
@@ -92,7 +92,7 @@
 }
 
 .orientation-subtitle {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Nimbus', system-ui, sans-serif;
     font-size: 0.8rem;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.6);
