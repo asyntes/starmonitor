@@ -5,7 +5,6 @@
     width: 100vw;
     height: 100vh;
     background-color: #000000;
-    /* Rimosso display: none - gestito via JavaScript inline style */
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -117,7 +116,6 @@
     }
 }
 
-/* Media queries solo per il contenuto, non per la visibilità */
 @media screen and (max-width: 568px) and (orientation: landscape) {
     .orientation-content {
         gap: 1.5rem;
