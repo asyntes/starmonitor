@@ -63,8 +63,7 @@ const OrientationWarning: React.FC = () => {
                 <h2 className="orientation-title">Rotate Device</h2>
 
                 <p className="orientation-message">
-                    For a better StarMonitor experience,
-                    please rotate your phone to portrait mode.
+                    Please rotate your device.
                 </p>
 
                 <p className="orientation-subtitle">
