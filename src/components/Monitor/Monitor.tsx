@@ -1,13 +1,23 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useThreeScene } from './hooks/useThreeScene';
 import { useSatelliteData } from './hooks/useSatelliteData';
 import SatelliteCounter from '../SatelliteCounter/SatelliteCounter';
 import Legend from '../Legend/Legend';
 
-const Monitor: React.FC = () => {
+interface MonitorProps {
+    onLoadingStateChange: (isLoading: boolean) => void;
+}
+
+const Monitor: React.FC<MonitorProps> = ({ onLoadingStateChange }) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const { satelliteCount, isLoading, setSatelliteCount, setIsLoading } = useSatelliteData();
+
     useThreeScene(mountRef, setSatelliteCount, setIsLoading);
+
+    // Sincronizza lo stato di loading con il componente App
+    useEffect(() => {
+        onLoadingStateChange(isLoading);
+    }, [isLoading, onLoadingStateChange]);
 
     return (
         <>
