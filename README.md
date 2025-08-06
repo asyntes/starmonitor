@@ -8,7 +8,6 @@
 - Interactive 3D Earth globe with mouse controls
 - Country borders with highlighting for Starlink-restricted regions
 - Real-time satellite counter
-- Realistic space environment with starfield background
 
 ## Tech Stack
 
