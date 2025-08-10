@@ -33,7 +33,7 @@ export const useThreeScene = (
         setupLighting(scene);
         createEarth(scene);
 
-        const initialBackwardRotation = -0.35;
+        const initialBackwardRotation = -0.62;
         scene.rotation.y = initialBackwardRotation;
 
         const isMobileViewport = () => {
