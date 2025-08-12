@@ -1,16 +1,19 @@
 import * as THREE from 'three';
 import { hasStarlinkBanned, hasStarlinkRestricted } from '../constants/bannedCountries';
 
+
 export const loadGeographicData = async () => {
     try {
-        const worldResponse = await fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson');
-        const worldData = await worldResponse.json();
+        const worldResponse = await fetch('/json/ne_110m_admin_0_countries.geojson');
 
+        if (!worldResponse.ok) {
+            throw new Error(`HTTP error! status: ${worldResponse.status}`);
+        }
+
+        const worldData = await worldResponse.json();
         return worldData;
     } catch (error) {
         console.error('Errore nel caricamento dei dati geografici:', error);
-        const response = await fetch('https://geojson.xyz/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson');
-        return await response.json();
     }
 };
 
