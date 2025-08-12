@@ -21,9 +21,9 @@ export const useThreeScene = (
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.screenSpacePanning = false;
-        controls.minDistance = 3;
+        controls.minDistance = 7;
         controls.maxDistance = 20;
-        controls.enablePan = true;
+        controls.enablePan = false;
 
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -46,12 +46,12 @@ export const useThreeScene = (
                 scene.position.y = 2.7;
                 camera.position.z = 15;
                 camera.position.y = 2;
-                controls.minDistance = 3;
+                controls.minDistance = 10;
             } else {
                 scene.position.y = 0;
                 camera.position.z = 10;
                 camera.position.y = 2;
-                controls.minDistance = 3;
+                controls.minDistance = 7;
             }
             controls.update();
         };
