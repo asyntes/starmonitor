@@ -175,8 +175,8 @@ const addCountryLabel = (scene: THREE.Scene, name: string, centroid: { lat: numb
     const sprite = new THREE.Sprite(material);
 
     let scale = 0.8;
-    if (category === 'banned') scale = 1.0;
-    if (category === 'restricted') scale = 0.9;
+    if (category === 'banned') scale = 0.8;
+    if (category === 'restricted') scale = 0.8;
 
     sprite.scale.set(scale, scale * 0.25, 1);
     sprite.position.copy(position);
