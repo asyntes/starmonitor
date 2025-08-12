@@ -117,7 +117,7 @@ const createTextTexture = (text: string, category: 'normal' | 'restricted' | 'ba
     canvas.width = 512;
     canvas.height = 128;
 
-    context.font = 'bold 32px Nimbus, Arial, sans-serif';
+    context.font = 'bold 2rem Nimbus, system-ui, sans-serif';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
 
