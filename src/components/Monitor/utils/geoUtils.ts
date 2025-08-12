@@ -146,7 +146,20 @@ const createTextTexture = (text: string, category: 'normal' | 'restricted' | 'ba
     return texture;
 };
 
+const EXCLUDED_COUNTRIES = new Set([
+    'Israel', 'Palestine', 'Palestinian Territory', 'West Bank', 'Gaza Strip',
+    'Gaza', 'Palestinian Territories', 'State of Palestine'
+]);
+
+const shouldExcludeCountry = (name: string): boolean => {
+    return EXCLUDED_COUNTRIES.has(name);
+};
+
 const addCountryLabel = (scene: THREE.Scene, name: string, centroid: { lat: number; lon: number }, category: 'normal' | 'restricted' | 'banned') => {
+    if (shouldExcludeCountry(name)) {
+        return;
+    }
+
     let displayName = name;
 
     const position = geoToCartesian(centroid.lat, centroid.lon);
@@ -207,6 +220,9 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                 feature.properties?.name ||
                 feature.properties?.ADMIN ||
                 feature.properties?.NAME_EN ||
+                feature.properties?.SOVEREIGNT ||
+                feature.properties?.GEOUNIT ||
+                feature.properties?.NAME_LONG ||
                 'Unknown';
 
             if (name && name !== 'Unknown' && name.length > 2 &&

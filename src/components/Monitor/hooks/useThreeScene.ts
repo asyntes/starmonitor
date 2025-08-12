@@ -133,7 +133,6 @@ export const useThreeScene = (
         animate();
 
         const handleResize = () => {
-            // Piccolo delay per assicurarsi che le dimensioni siano aggiornate
             setTimeout(() => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
