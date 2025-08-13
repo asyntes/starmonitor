@@ -16,7 +16,7 @@ const Legend: React.FC = () => {
                 </div>
                 <div className="legend-item">
                     <div className="legend-color banned"></div>
-                    <span className="legend-label">Unvailable</span>
+                    <span className="legend-label">Unavailable</span>
                 </div>
             </div>
         </div>
