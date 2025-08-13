@@ -23,7 +23,7 @@ export const useThreeScene = (
         controls.screenSpacePanning = false;
         controls.minDistance = 7;
         controls.maxDistance = 20;
-        controls.enablePan = true;
+        controls.enablePan = false;
 
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
