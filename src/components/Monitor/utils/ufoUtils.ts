@@ -6,6 +6,10 @@ interface UFOInstance {
     targetPosition: THREE.Vector3;
     bobOffset: number;
     lastSpawn: number;
+    fadingOut: boolean;
+    fadeStartTime: number;
+    fadingIn: boolean;
+    fadeInStartTime: number;
 }
 
 let ufoInstance: UFOInstance | null = null;
@@ -19,17 +23,19 @@ export const createUFO = (): THREE.Group => {
         color: 0x888888,
         shininess: 100,
         transparent: true,
-        opacity: 0.9
+        opacity: 1.0
     });
+    (saucerMaterial as any).originalOpacity = 1.0;
     const saucer = new THREE.Mesh(saucerGeometry, saucerMaterial);
 
     const domeGeometry = new THREE.SphereGeometry(0.08, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
     const domeMaterial = new THREE.MeshPhongMaterial({
         color: 0x444466,
         transparent: true,
-        opacity: 0.7,
+        opacity: 1.0,
         shininess: 200
     });
+    (domeMaterial as any).originalOpacity = 1.0;
     const dome = new THREE.Mesh(domeGeometry, domeMaterial);
     dome.position.y = 0.03;
 
@@ -37,12 +43,14 @@ export const createUFO = (): THREE.Group => {
     const lightMaterial = new THREE.MeshBasicMaterial({
         color: 0x00ff88,
         transparent: true,
-        opacity: 0.8
+        opacity: 1.0
     });
+    (lightMaterial as any).originalOpacity = 1.0;
 
     for (let i = 0; i < 6; i++) {
         const angle = (i / 6) * Math.PI * 2;
-        const light = new THREE.Mesh(lightGeometry, lightMaterial);
+        const light = new THREE.Mesh(lightGeometry, lightMaterial.clone());
+        (light.material as any).originalOpacity = 1.0;
         light.position.x = Math.cos(angle) * 0.12;
         light.position.z = Math.sin(angle) * 0.12;
         light.position.y = -0.03;
@@ -100,6 +108,17 @@ export const getRandomTargetPosition = (currentPos: THREE.Vector3): THREE.Vector
     return position;
 };
 
+export const forceUFODisappear = (): void => {
+    if (ufoInstance && !ufoInstance.fadingOut) {
+        ufoInstance.fadingOut = true;
+        ufoInstance.fadeStartTime = Date.now();
+    }
+};
+
+export const getUFOGroup = (): THREE.Group | null => {
+    return ufoInstance ? ufoInstance.group : null;
+};
+
 export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
     const now = Date.now();
 
@@ -108,12 +127,25 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
         const spawnPos = getRandomSpawnPosition();
         ufoGroup.position.copy(spawnPos);
 
+        ufoGroup.children.forEach(child => {
+            if (child instanceof THREE.Mesh && child.material) {
+                const material = child.material as THREE.Material & { opacity?: number };
+                if (material.opacity !== undefined) {
+                    material.opacity = 0;
+                }
+            }
+        });
+
         ufoInstance = {
             group: ufoGroup,
             velocity: new THREE.Vector3(0, 0, 0),
             targetPosition: getRandomTargetPosition(spawnPos),
             bobOffset: Math.random() * Math.PI * 2,
-            lastSpawn: now
+            lastSpawn: now,
+            fadingOut: false,
+            fadeStartTime: 0,
+            fadingIn: true,
+            fadeInStartTime: now
         };
 
         scene.add(ufoGroup);
@@ -122,10 +154,52 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
     if (ufoInstance) {
         const ufo = ufoInstance;
 
-        if (now - ufo.lastSpawn > 60000) {
-            scene.remove(ufo.group);
-            ufoInstance = null;
-            return;
+        if (ufo.fadingIn) {
+            const fadeElapsed = now - ufo.fadeInStartTime;
+            const fadeDuration = 2000;
+            const fadeProgress = Math.min(fadeElapsed / fadeDuration, 1);
+            
+            ufo.group.children.forEach(child => {
+                if (child instanceof THREE.Mesh && child.material) {
+                    const material = child.material as THREE.Material & { opacity?: number };
+                    if (material.opacity !== undefined) {
+                        const originalOpacity = (child.material as any).originalOpacity || 1;
+                        material.opacity = fadeProgress * originalOpacity;
+                    }
+                }
+            });
+
+            if (fadeProgress >= 1) {
+                ufo.fadingIn = false;
+            }
+        }
+
+        if (now - ufo.lastSpawn > 60000 && !ufo.fadingOut && !ufo.fadingIn) {
+            ufo.fadingOut = true;
+            ufo.fadeStartTime = now;
+        }
+
+        if (ufo.fadingOut) {
+            const fadeElapsed = now - ufo.fadeStartTime;
+            const fadeDuration = 2000;
+            const fadeProgress = Math.min(fadeElapsed / fadeDuration, 1);
+            const opacity = 1 - fadeProgress;
+
+            ufo.group.children.forEach(child => {
+                if (child instanceof THREE.Mesh && child.material) {
+                    const material = child.material as THREE.Material & { opacity?: number };
+                    if (material.opacity !== undefined) {
+                        const originalOpacity = (child.material as any).originalOpacity || 1;
+                        material.opacity = opacity * originalOpacity;
+                    }
+                }
+            });
+
+            if (fadeProgress >= 1) {
+                scene.remove(ufo.group);
+                ufoInstance = null;
+                return;
+            }
         }
 
         const direction = new THREE.Vector3()
@@ -151,14 +225,17 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             ufo.targetPosition = getRandomTargetPosition(ufo.group.position);
         }
 
-        const lights = ufo.group.children.filter(child =>
-            child instanceof THREE.Mesh &&
-            (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x00ff88
-        );
+        if (!ufo.fadingOut && !ufo.fadingIn) {
+            const lights = ufo.group.children.filter(child =>
+                child instanceof THREE.Mesh &&
+                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x00ff88
+            );
 
-        lights.forEach((light, index) => {
-            const material = (light as THREE.Mesh).material as THREE.MeshBasicMaterial;
-            material.opacity = 0.5 + Math.sin(now * 0.01 + index) * 0.3;
-        });
+            lights.forEach((light, index) => {
+                const material = (light as THREE.Mesh).material as THREE.MeshBasicMaterial;
+                const originalOpacity = (material as any).originalOpacity || 1.0;
+                material.opacity = originalOpacity * (0.5 + Math.sin(now * 0.01 + index) * 0.3);
+            });
+        }
     }
 };

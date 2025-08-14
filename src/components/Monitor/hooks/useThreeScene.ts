@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { createCleanSpaceSkybox, setupLighting, createEarth, updateComets } from '../utils/earthUtils';
 import { loadGeographicData, drawGeographicBorders } from '../utils/geoUtils';
 import { fetchTLEData, createSatellitePoints, getSatellitePosition } from '../utils/satelliteUtils';
-import { updateUFO } from '../utils/ufoUtils';
+import { updateUFO, forceUFODisappear, getUFOGroup } from '../utils/ufoUtils';
 
 export const useThreeScene = (
     mountRef: React.RefObject<HTMLDivElement | null>,
@@ -63,6 +63,40 @@ export const useThreeScene = (
         let isUserInteracting = false;
         let lastInteractionTime = Date.now();
         const INACTIVITY_TIMEOUT = 7000;
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        const handleClick = (event: MouseEvent | TouchEvent) => {
+            event.preventDefault();
+            
+            let clientX: number, clientY: number;
+            
+            if ('touches' in event) {
+                if (event.touches.length === 0) return;
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+            
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            
+            const ufoGroup = getUFOGroup();
+            if (ufoGroup) {
+                const intersects = raycaster.intersectObjects(ufoGroup.children, true);
+                if (intersects.length > 0) {
+                    forceUFODisappear();
+                }
+            }
+        };
+
+        renderer.domElement.addEventListener('click', handleClick);
+        renderer.domElement.addEventListener('touchstart', handleClick);
 
         loadGeographicData().then((geoData) => {
             drawGeographicBorders(scene, geoData);
@@ -159,6 +193,8 @@ export const useThreeScene = (
         return () => {
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('orientationchange', handleResize);
+            renderer.domElement.removeEventListener('click', handleClick);
+            renderer.domElement.removeEventListener('touchstart', handleClick);
             if (currentMount && renderer.domElement) {
                 currentMount.removeChild(renderer.domElement);
             }
