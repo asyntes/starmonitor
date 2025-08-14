@@ -177,7 +177,7 @@ const addCountryLabel = (scene: THREE.Scene, name: string, centroid: { lat: numb
 
     const sprite = new THREE.Sprite(material);
 
-    let scale = 0.8;
+    let scale = 1.1;
 
     sprite.scale.set(scale, scale * 0.25, 1);
     sprite.position.copy(position);

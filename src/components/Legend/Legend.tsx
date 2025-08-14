@@ -8,7 +8,7 @@ const Legend: React.FC = () => {
             <div className="legend-items">
                 <div className="legend-item">
                     <div className="legend-color active"></div>
-                    <span className="legend-label">Active</span>
+                    <span className="legend-label">Available</span>
                 </div>
                 <div className="legend-item">
                     <div className="legend-color restricted"></div>
@@ -16,7 +16,7 @@ const Legend: React.FC = () => {
                 </div>
                 <div className="legend-item">
                     <div className="legend-color banned"></div>
-                    <span className="legend-label">Banned</span>
+                    <span className="legend-label">Unavailable</span>
                 </div>
             </div>
         </div>
