@@ -236,6 +236,30 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                         lon: 118.0
                     };
                     addCountryLabel(scene, 'Indonesia', indonesiaCentralCentroid, category);
+                } else if (name === 'Montenegro') {
+                    const montenegroAdjustedCentroid = {
+                        lat: centroid.lat + 0.5,
+                        lon: centroid.lon
+                    };
+                    addCountryLabel(scene, name, montenegroAdjustedCentroid, category);
+                } else if (name === 'Serbia') {
+                    const serbiaAdjustedCentroid = {
+                        lat: centroid.lat + 0.8,
+                        lon: centroid.lon
+                    };
+                    addCountryLabel(scene, name, serbiaAdjustedCentroid, category);
+                } else if (name === 'Albania') {
+                    const albaniaAdjustedCentroid = {
+                        lat: centroid.lat - 0.6,
+                        lon: centroid.lon
+                    };
+                    addCountryLabel(scene, name, albaniaAdjustedCentroid, category);
+                } else if (name === 'N. Cyprus') {
+                    const cyprusAdjustedCentroid = {
+                        lat: centroid.lat + 0.4,
+                        lon: centroid.lon
+                    };
+                    addCountryLabel(scene, name, cyprusAdjustedCentroid, category);
                 } else {
                     addCountryLabel(scene, name, centroid, category);
                 }
