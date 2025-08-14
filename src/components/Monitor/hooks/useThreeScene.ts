@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { createCleanSpaceSkybox, setupLighting, createEarth, updateComets } from '../utils/earthUtils';
 import { loadGeographicData, drawGeographicBorders } from '../utils/geoUtils';
 import { fetchTLEData, createSatellitePoints, getSatellitePosition } from '../utils/satelliteUtils';
+import { updateUFO } from '../utils/ufoUtils';
 
 export const useThreeScene = (
     mountRef: React.RefObject<HTMLDivElement | null>,
@@ -132,6 +133,7 @@ export const useThreeScene = (
             }
 
             updateComets(scene, deltaTime * 0.016);
+            updateUFO(scene, deltaTime * 0.016);
 
             controls.update();
             renderer.render(scene, camera);
