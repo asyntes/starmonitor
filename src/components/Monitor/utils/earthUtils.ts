@@ -125,3 +125,88 @@ export const createEarth = (scene: THREE.Scene) => {
         (error) => console.error('Errore caricamento texture:', error)
     );
 };
+
+interface Comet {
+    head: THREE.Mesh;
+    velocity: THREE.Vector3;
+    life: number;
+    maxLife: number;
+}
+
+const comets: Comet[] = [];
+
+export const createComet = (scene: THREE.Scene): Comet => {
+    // Create simple comet head with lower opacity
+    const headGeometry = new THREE.SphereGeometry(0.25, 8, 8);
+    const headMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.4 + Math.random() * 0.3 // Start with 0.4-0.7 opacity
+    });
+    const head = new THREE.Mesh(headGeometry, headMaterial);
+
+    // Random starting position on a sphere around the scene for full 360 coverage
+    const phi = Math.random() * Math.PI * 2; // Azimuth angle (0 to 2π)
+    const theta = Math.acos(2 * Math.random() - 1); // Polar angle for uniform sphere distribution
+    const distance = 180 + Math.random() * 120;
+    
+    const startPos = new THREE.Vector3(
+        distance * Math.sin(theta) * Math.cos(phi),
+        distance * Math.cos(theta),
+        distance * Math.sin(theta) * Math.sin(phi)
+    );
+
+    head.position.copy(startPos);
+
+    // Random velocity in any direction
+    const velocityPhi = Math.random() * Math.PI * 2;
+    const velocityTheta = Math.acos(2 * Math.random() - 1);
+    const speed = 2.5 + Math.random() * 2.5;
+    
+    const velocity = new THREE.Vector3(
+        speed * Math.sin(velocityTheta) * Math.cos(velocityPhi),
+        speed * Math.cos(velocityTheta),
+        speed * Math.sin(velocityTheta) * Math.sin(velocityPhi)
+    );
+
+    scene.add(head);
+
+    const maxLife = 80 + Math.random() * 60; // Slightly longer to see them better
+
+    return {
+        head,
+        velocity,
+        life: maxLife,
+        maxLife
+    };
+};
+
+export const updateComets = (scene: THREE.Scene, deltaTime: number) => {
+    // Randomly spawn new comets
+    if (Math.random() < 0.005) { // Increased from 0.003 to 0.005
+        const newComet = createComet(scene);
+        comets.push(newComet);
+    }
+
+    // Update existing comets
+    for (let i = comets.length - 1; i >= 0; i--) {
+        const comet = comets[i];
+        
+        // Update position
+        comet.head.position.add(comet.velocity.clone().multiplyScalar(deltaTime));
+        
+        // Update life and fade
+        comet.life -= deltaTime;
+        const fadeRatio = comet.life / comet.maxLife;
+        
+        (comet.head.material as THREE.MeshBasicMaterial).opacity = fadeRatio;
+        
+        // Remove dead comets
+        if (comet.life <= 0 || comet.head.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 350) {
+            scene.remove(comet.head);
+            comet.head.geometry.dispose();
+            (comet.head.material as THREE.Material).dispose();
+            comets.splice(i, 1);
+        }
+    }
+};
