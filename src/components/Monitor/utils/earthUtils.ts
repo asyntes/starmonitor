@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import earthMap from '../../../assets/earth_atmos_2048.jpg?url';  // Up to src/, then into assets/
+import earthMap from '../../../assets/earth_atmos_2048.jpg?url';
 import earthNormal from '../../../assets/earth_normal_2048.jpg?url';
 
 export const createCleanSpaceSkybox = (scene: THREE.Scene) => {
@@ -16,7 +16,6 @@ export const createCleanSpaceSkybox = (scene: THREE.Scene) => {
 
         ctx.fillStyle = '#ffffff';
 
-        // Array to store star positions for distance checking
         const starPositions: { x: number; y: number }[] = [];
         const MIN_DISTANCE = 8; // Minimum distance between stars
 
@@ -27,11 +26,10 @@ export const createCleanSpaceSkybox = (scene: THREE.Scene) => {
             });
         };
 
-        // Main stars - reduced from 4000 to 1200
         for (let i = 0; i < 1200; i++) {
             let x: number, y: number;
             let attempts = 0;
-            
+
             do {
                 x = Math.floor(Math.random() * 2048);
                 y = Math.floor(Math.random() * 1024);
@@ -59,11 +57,10 @@ export const createCleanSpaceSkybox = (scene: THREE.Scene) => {
             }
         }
 
-        // Background dimmer stars - reduced from 2000 to 600
         for (let i = 0; i < 600; i++) {
             let x: number, y: number;
             let attempts = 0;
-            
+
             do {
                 x = Math.floor(Math.random() * 2048);
                 y = Math.floor(Math.random() * 1024);
@@ -136,20 +133,18 @@ interface Comet {
 const comets: Comet[] = [];
 
 export const createComet = (scene: THREE.Scene): Comet => {
-    // Create simple comet head with lower opacity
     const headGeometry = new THREE.SphereGeometry(0.25, 8, 8);
     const headMaterial = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.4 + Math.random() * 0.3 // Start with 0.4-0.7 opacity
+        opacity: 0.4 + Math.random() * 0.3
     });
     const head = new THREE.Mesh(headGeometry, headMaterial);
 
-    // Random starting position on a sphere around the scene for full 360 coverage
-    const phi = Math.random() * Math.PI * 2; // Azimuth angle (0 to 2π)
-    const theta = Math.acos(2 * Math.random() - 1); // Polar angle for uniform sphere distribution
+    const phi = Math.random() * Math.PI * 2;
+    const theta = Math.acos(2 * Math.random() - 1);
     const distance = 180 + Math.random() * 120;
-    
+
     const startPos = new THREE.Vector3(
         distance * Math.sin(theta) * Math.cos(phi),
         distance * Math.cos(theta),
@@ -158,20 +153,42 @@ export const createComet = (scene: THREE.Scene): Comet => {
 
     head.position.copy(startPos);
 
-    // Random velocity in any direction
     const velocityPhi = Math.random() * Math.PI * 2;
     const velocityTheta = Math.acos(2 * Math.random() - 1);
     const speed = 2.5 + Math.random() * 2.5;
-    
-    const velocity = new THREE.Vector3(
+
+    let velocity = new THREE.Vector3(
         speed * Math.sin(velocityTheta) * Math.cos(velocityPhi),
         speed * Math.cos(velocityTheta),
         speed * Math.sin(velocityTheta) * Math.sin(velocityPhi)
     );
 
+    const centerDirection = startPos.clone().normalize().negate();
+    const dotProduct = velocity.dot(centerDirection);
+
+    const safetyRadius = 50;
+    const angleToCenter = Math.acos(Math.abs(dotProduct / velocity.length()));
+    const closestDistance = startPos.length() * Math.sin(angleToCenter);
+
+    if (dotProduct > 0 || closestDistance < safetyRadius) {
+        const awayDirection = startPos.clone().normalize();
+        const perpendicular = new THREE.Vector3()
+            .crossVectors(awayDirection, velocity)
+            .normalize();
+        const tangential = new THREE.Vector3()
+            .crossVectors(perpendicular, awayDirection)
+            .normalize();
+
+        const outwardWeight = 0.3 + Math.random() * 0.4;
+        velocity = awayDirection.multiplyScalar(outwardWeight)
+            .add(tangential.multiplyScalar(1 - outwardWeight))
+            .normalize()
+            .multiplyScalar(speed);
+    }
+
     scene.add(head);
 
-    const maxLife = 80 + Math.random() * 60; // Slightly longer to see them better
+    const maxLife = 80 + Math.random() * 60;
 
     return {
         head,
@@ -182,26 +199,21 @@ export const createComet = (scene: THREE.Scene): Comet => {
 };
 
 export const updateComets = (scene: THREE.Scene, deltaTime: number) => {
-    // Randomly spawn new comets
-    if (Math.random() < 0.005) { // Increased from 0.003 to 0.005
+    if (Math.random() < 0.007) {
         const newComet = createComet(scene);
         comets.push(newComet);
     }
 
-    // Update existing comets
     for (let i = comets.length - 1; i >= 0; i--) {
         const comet = comets[i];
-        
-        // Update position
+
         comet.head.position.add(comet.velocity.clone().multiplyScalar(deltaTime));
-        
-        // Update life and fade
+
         comet.life -= deltaTime;
         const fadeRatio = comet.life / comet.maxLife;
-        
+
         (comet.head.material as THREE.MeshBasicMaterial).opacity = fadeRatio;
-        
-        // Remove dead comets
+
         if (comet.life <= 0 || comet.head.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 350) {
             scene.remove(comet.head);
             comet.head.geometry.dispose();

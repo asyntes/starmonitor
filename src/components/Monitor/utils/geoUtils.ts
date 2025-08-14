@@ -229,8 +229,7 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
             if (name && name !== 'Unknown' && name.length > 2 &&
                 !isNaN(centroid.lat) && !isNaN(centroid.lon) &&
                 Math.abs(centroid.lat) <= 90 && Math.abs(centroid.lon) <= 180) {
-                
-                // Adjust Indonesia label position to be more central
+
                 if (name === 'Indonesia') {
                     const indonesiaCentralCentroid = {
                         lat: -2.5,
@@ -249,7 +248,6 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                     addCountryLabel(scene, 'United States', continentalUSCentroid, category);
                 }
 
-                // Add French Guiana label for France
                 if (name === 'France') {
                     const frenchGuianaCentroid = {
                         lat: 3.5,

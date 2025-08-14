@@ -131,8 +131,7 @@ export const useThreeScene = (
                 scene.rotation.y += 0.001;
             }
 
-            // Update comets
-            updateComets(scene, deltaTime * 0.016); // Convert to roughly 60fps timing
+            updateComets(scene, deltaTime * 0.016);
 
             controls.update();
             renderer.render(scene, camera);
