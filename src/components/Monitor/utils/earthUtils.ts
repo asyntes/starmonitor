@@ -16,32 +16,65 @@ export const createCleanSpaceSkybox = (scene: THREE.Scene) => {
 
         ctx.fillStyle = '#ffffff';
 
-        for (let i = 0; i < 4000; i++) {
-            const x = Math.floor(Math.random() * 2048);
-            const y = Math.floor(Math.random() * 1024);
-            const brightness = Math.random();
+        // Array to store star positions for distance checking
+        const starPositions: { x: number; y: number }[] = [];
+        const MIN_DISTANCE = 8; // Minimum distance between stars
 
-            if (brightness > 0.999) {
-                ctx.globalAlpha = 0.4;
-                ctx.beginPath();
-                ctx.arc(x + 0.5, y + 0.5, 0.02, 0, Math.PI * 2);
-                ctx.fill();
-            } else if (brightness > 0.995) {
-                ctx.globalAlpha = 0.25;
-                ctx.beginPath();
-                ctx.arc(x + 0.5, y + 0.5, 0.015, 0, Math.PI * 2);
-                ctx.fill();
-            } else {
-                ctx.globalAlpha = Math.random() * 0.15 + 0.05;
-                ctx.fillRect(x, y, 1, 1);
+        const isValidPosition = (x: number, y: number): boolean => {
+            return starPositions.every(pos => {
+                const distance = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+                return distance >= MIN_DISTANCE;
+            });
+        };
+
+        // Main stars - reduced from 4000 to 1200
+        for (let i = 0; i < 1200; i++) {
+            let x: number, y: number;
+            let attempts = 0;
+            
+            do {
+                x = Math.floor(Math.random() * 2048);
+                y = Math.floor(Math.random() * 1024);
+                attempts++;
+            } while (!isValidPosition(x, y) && attempts < 10);
+
+            if (attempts < 10) {
+                starPositions.push({ x, y });
+                const brightness = Math.random();
+
+                if (brightness > 0.999) {
+                    ctx.globalAlpha = 0.4;
+                    ctx.beginPath();
+                    ctx.arc(x + 0.5, y + 0.5, 0.02, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (brightness > 0.995) {
+                    ctx.globalAlpha = 0.25;
+                    ctx.beginPath();
+                    ctx.arc(x + 0.5, y + 0.5, 0.015, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.globalAlpha = Math.random() * 0.15 + 0.05;
+                    ctx.fillRect(x, y, 1, 1);
+                }
             }
         }
 
-        for (let i = 0; i < 2000; i++) {
-            const x = Math.floor(Math.random() * 2048);
-            const y = Math.floor(Math.random() * 1024);
-            ctx.globalAlpha = Math.random() * 0.05 + 0.01;
-            ctx.fillRect(x, y, 1, 1);
+        // Background dimmer stars - reduced from 2000 to 600
+        for (let i = 0; i < 600; i++) {
+            let x: number, y: number;
+            let attempts = 0;
+            
+            do {
+                x = Math.floor(Math.random() * 2048);
+                y = Math.floor(Math.random() * 1024);
+                attempts++;
+            } while (!isValidPosition(x, y) && attempts < 5);
+
+            if (attempts < 5) {
+                starPositions.push({ x, y });
+                ctx.globalAlpha = Math.random() * 0.05 + 0.01;
+                ctx.fillRect(x, y, 1, 1);
+            }
         }
     }
 
