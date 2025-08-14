@@ -199,7 +199,7 @@ export const createComet = (scene: THREE.Scene): Comet => {
 };
 
 export const updateComets = (scene: THREE.Scene, deltaTime: number) => {
-    if (Math.random() < 0.01) {
+    if (Math.random() < 0.02) {
         const newComet = createComet(scene);
         comets.push(newComet);
     }
