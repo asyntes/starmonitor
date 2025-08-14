@@ -108,6 +108,17 @@ export const getRandomTargetPosition = (currentPos: THREE.Vector3): THREE.Vector
     return position;
 };
 
+export const forceUFODisappear = (): void => {
+    if (ufoInstance && !ufoInstance.fadingOut) {
+        ufoInstance.fadingOut = true;
+        ufoInstance.fadeStartTime = Date.now();
+    }
+};
+
+export const getUFOGroup = (): THREE.Group | null => {
+    return ufoInstance ? ufoInstance.group : null;
+};
+
 export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
     const now = Date.now();
 
