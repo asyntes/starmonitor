@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { createCleanSpaceSkybox, setupLighting, createEarth } from '../utils/earthUtils';
+import { createCleanSpaceSkybox, setupLighting, createEarth, updateComets } from '../utils/earthUtils';
 import { loadGeographicData, drawGeographicBorders } from '../utils/geoUtils';
 import { fetchTLEData, createSatellitePoints, getSatellitePosition } from '../utils/satelliteUtils';
+import { updateUFO } from '../utils/ufoUtils';
 
 export const useThreeScene = (
     mountRef: React.RefObject<HTMLDivElement | null>,
@@ -112,9 +113,13 @@ export const useThreeScene = (
 
         let animationFrameId: number;
         const cleanupFunctions: (() => void)[] = [];
+        let lastTime = 0;
 
-        const animate = () => {
+        const animate = (time: number) => {
             animationFrameId = requestAnimationFrame(animate);
+
+            const deltaTime = time - lastTime;
+            lastTime = time;
 
             if (!isAutoRotating && !isUserInteracting) {
                 const timeSinceLastInteraction = Date.now() - lastInteractionTime;
@@ -127,10 +132,13 @@ export const useThreeScene = (
                 scene.rotation.y += 0.001;
             }
 
+            updateComets(scene, deltaTime * 0.016);
+            updateUFO(scene, deltaTime * 0.016);
+
             controls.update();
             renderer.render(scene, camera);
         };
-        animate();
+        animate(0);
 
         const handleResize = () => {
             setTimeout(() => {

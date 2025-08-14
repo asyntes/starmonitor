@@ -14,7 +14,6 @@ const Monitor: React.FC<MonitorProps> = ({ onLoadingStateChange }) => {
 
     useThreeScene(mountRef, setSatelliteCount, setIsLoading);
 
-    // Sincronizza lo stato di loading con il componente App
     useEffect(() => {
         onLoadingStateChange(isLoading);
     }, [isLoading, onLoadingStateChange]);

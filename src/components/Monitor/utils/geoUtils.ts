@@ -229,7 +229,40 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
             if (name && name !== 'Unknown' && name.length > 2 &&
                 !isNaN(centroid.lat) && !isNaN(centroid.lon) &&
                 Math.abs(centroid.lat) <= 90 && Math.abs(centroid.lon) <= 180) {
-                addCountryLabel(scene, name, centroid, category);
+
+                if (name === 'Indonesia') {
+                    const indonesiaCentralCentroid = {
+                        lat: -2.5,
+                        lon: 118.0
+                    };
+                    addCountryLabel(scene, 'Indonesia', indonesiaCentralCentroid, category);
+                } else if (name === 'Montenegro') {
+                    const montenegroAdjustedCentroid = {
+                        lat: centroid.lat + 0.5,
+                        lon: centroid.lon
+                    };
+                    addCountryLabel(scene, name, montenegroAdjustedCentroid, category);
+                } else if (name === 'Serbia') {
+                    const serbiaAdjustedCentroid = {
+                        lat: centroid.lat + 0.8,
+                        lon: centroid.lon
+                    };
+                    addCountryLabel(scene, name, serbiaAdjustedCentroid, category);
+                } else if (name === 'Albania') {
+                    const albaniaAdjustedCentroid = {
+                        lat: centroid.lat - 0.6,
+                        lon: centroid.lon
+                    };
+                    addCountryLabel(scene, name, albaniaAdjustedCentroid, category);
+                } else if (name === 'N. Cyprus') {
+                    const cyprusAdjustedCentroid = {
+                        lat: centroid.lat + 0.4,
+                        lon: centroid.lon
+                    };
+                    addCountryLabel(scene, name, cyprusAdjustedCentroid, category);
+                } else {
+                    addCountryLabel(scene, name, centroid, category);
+                }
 
                 if (name === 'United States of America' || name === 'United States') {
                     const continentalUSCentroid = {
@@ -237,6 +270,14 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                         lon: -98.5795
                     };
                     addCountryLabel(scene, 'United States', continentalUSCentroid, category);
+                }
+
+                if (name === 'France') {
+                    const frenchGuianaCentroid = {
+                        lat: 3.5,
+                        lon: -53.0
+                    };
+                    addCountryLabel(scene, 'French Guiana', frenchGuianaCentroid, 'restricted');
                 }
             }
 
