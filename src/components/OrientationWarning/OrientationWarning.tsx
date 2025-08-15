@@ -14,7 +14,7 @@ const OrientationWarning: React.FC = () => {
             
             const isTablet = (maxDimension > 768 && maxDimension <= 1024) || 
                            (minDimension > 600 && maxDimension <= 1366);
-            const isPhone = maxDimension <= 768 && !isTablet;
+            const isPhone = minDimension <= 600 && !isTablet;
 
             console.log('Orientation check:', {
                 isLandscape,
