@@ -7,19 +7,16 @@ const OrientationWarning: React.FC = () => {
     useEffect(() => {
         const checkOrientation = () => {
             const isLandscape = window.innerWidth > window.innerHeight;
-            const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
-            const isMobile = (window.innerWidth <= 768 ||
-                (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) ||
-                ('ontouchstart' in window)) && !isTablet;
+            const isPhone = window.innerWidth <= 768;
 
             console.log('Orientation check:', {
                 isLandscape,
-                isMobile,
+                isPhone,
                 width: window.innerWidth,
                 height: window.innerHeight
             });
 
-            setShouldShowWarning(isMobile && isLandscape);
+            setShouldShowWarning(isPhone && isLandscape);
         };
 
         checkOrientation();
