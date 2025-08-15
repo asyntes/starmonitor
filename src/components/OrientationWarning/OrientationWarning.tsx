@@ -9,12 +9,12 @@ const OrientationWarning: React.FC = () => {
             const width = window.innerWidth;
             const height = window.innerHeight;
             const isLandscape = width > height;
-            const maxDimension = Math.max(width, height);
-            const minDimension = Math.min(width, height);
             
-            const isTablet = (maxDimension > 768 && maxDimension <= 1024) || 
-                           (minDimension > 600 && maxDimension <= 1366);
-            const isPhone = minDimension <= 600 && !isTablet;
+            const isTablet = ('ontouchstart' in window) && 
+                           (Math.min(width, height) >= 768 || 
+                            (Math.max(width, height) >= 1024 && Math.min(width, height) >= 600));
+            
+            const isPhone = ('ontouchstart' in window) && !isTablet;
 
             console.log('Orientation check:', {
                 isLandscape,
@@ -22,8 +22,7 @@ const OrientationWarning: React.FC = () => {
                 isTablet,
                 width,
                 height,
-                maxDimension,
-                minDimension
+                hasTouch: 'ontouchstart' in window
             });
 
             setShouldShowWarning(isPhone && isLandscape);
