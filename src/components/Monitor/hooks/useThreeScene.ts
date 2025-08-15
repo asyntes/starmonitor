@@ -38,8 +38,8 @@ export const useThreeScene = (
         scene.rotation.y = initialBackwardRotation;
 
         const isMobileViewport = () => {
-            const aspectRatio = window.innerWidth / window.innerHeight;
-            return window.innerWidth <= 768 || (window.innerWidth <= 1024 && aspectRatio < 1.2);
+            const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+            return window.innerWidth <= 768 && !isTablet;
         };
 
         const setupCameraAndScene = () => {
