@@ -58,16 +58,23 @@ export const useThreeScene = (
 
         const setupCameraAndScene = () => {
             const deviceType = getDeviceType();
+            const aspectRatio = window.innerWidth / window.innerHeight;
             
             if (deviceType === 'phone') {
-                scene.position.y = 2.7;
-                camera.position.z = 15;
-                camera.position.y = 2;
+                if (aspectRatio < 0.5) {
+                    scene.position.y = 1.5;
+                    camera.position.z = 16;
+                    camera.position.y = 1;
+                } else {
+                    scene.position.y = 2.7;
+                    camera.position.z = 15;
+                    camera.position.y = 2;
+                }
                 controls.minDistance = 5;
             } else if (deviceType === 'tablet-portrait') {
-                scene.position.y = 0;
+                scene.position.y = 1;
                 camera.position.z = 18;
-                camera.position.y = 2;
+                camera.position.y = 1;
                 controls.minDistance = 6;
             } else {
                 scene.position.y = 0;
