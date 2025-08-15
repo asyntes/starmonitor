@@ -6,14 +6,24 @@ const OrientationWarning: React.FC = () => {
 
     useEffect(() => {
         const checkOrientation = () => {
-            const isLandscape = window.innerWidth > window.innerHeight;
-            const isPhone = window.innerWidth <= 768;
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const isLandscape = width > height;
+            const maxDimension = Math.max(width, height);
+            const minDimension = Math.min(width, height);
+            
+            const isTablet = (maxDimension > 768 && maxDimension <= 1024) || 
+                           (minDimension > 600 && maxDimension <= 1366);
+            const isPhone = maxDimension <= 768 && !isTablet;
 
             console.log('Orientation check:', {
                 isLandscape,
                 isPhone,
-                width: window.innerWidth,
-                height: window.innerHeight
+                isTablet,
+                width,
+                height,
+                maxDimension,
+                minDimension
             });
 
             setShouldShowWarning(isPhone && isLandscape);

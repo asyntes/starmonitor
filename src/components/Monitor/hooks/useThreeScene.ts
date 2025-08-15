@@ -41,11 +41,16 @@ export const useThreeScene = (
             const width = window.innerWidth;
             const height = window.innerHeight;
             const isLandscape = width > height;
+            const maxDimension = Math.max(width, height);
+            const minDimension = Math.min(width, height);
             
-            if (width <= 768) {
-                return 'phone';
-            } else if (width <= 1024) {
+            const isTablet = (maxDimension > 768 && maxDimension <= 1024) || 
+                           (minDimension > 600 && maxDimension <= 1366);
+            
+            if (isTablet) {
                 return isLandscape ? 'tablet-landscape' : 'tablet-portrait';
+            } else if (maxDimension <= 768) {
+                return 'phone';
             } else {
                 return 'desktop';
             }
