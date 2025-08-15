@@ -62,9 +62,9 @@ export const useThreeScene = (
             
             if (deviceType === 'phone') {
                 if (aspectRatio < 0.5) {
-                    scene.position.y = 1.5;
+                    scene.position.y = 2.5;
                     camera.position.z = 16;
-                    camera.position.y = 1;
+                    camera.position.y = 0.5;
                 } else {
                     scene.position.y = 2.7;
                     camera.position.z = 15;
@@ -72,9 +72,9 @@ export const useThreeScene = (
                 }
                 controls.minDistance = 5;
             } else if (deviceType === 'tablet-portrait') {
-                scene.position.y = 1;
+                scene.position.y = 2;
                 camera.position.z = 18;
-                camera.position.y = 1;
+                camera.position.y = 0.5;
                 controls.minDistance = 6;
             } else {
                 scene.position.y = 0;
