@@ -37,17 +37,38 @@ export const useThreeScene = (
         const initialBackwardRotation = -0.62;
         scene.rotation.y = initialBackwardRotation;
 
-        const isMobileViewport = () => {
-            const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
-            return window.innerWidth <= 768 && !isTablet;
+        const getDeviceType = () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const isLandscape = width > height;
+            const maxDimension = Math.max(width, height);
+            const minDimension = Math.min(width, height);
+            
+            const isTablet = (maxDimension > 768 && maxDimension <= 1024) || 
+                           (minDimension > 600 && maxDimension <= 1366);
+            
+            if (isTablet) {
+                return isLandscape ? 'tablet-landscape' : 'tablet-portrait';
+            } else if (maxDimension <= 768) {
+                return 'phone';
+            } else {
+                return 'desktop';
+            }
         };
 
         const setupCameraAndScene = () => {
-            if (isMobileViewport()) {
+            const deviceType = getDeviceType();
+            
+            if (deviceType === 'phone') {
                 scene.position.y = 2.7;
                 camera.position.z = 15;
                 camera.position.y = 2;
                 controls.minDistance = 5;
+            } else if (deviceType === 'tablet-portrait') {
+                scene.position.y = 0;
+                camera.position.z = 18;
+                camera.position.y = 2;
+                controls.minDistance = 6;
             } else {
                 scene.position.y = 0;
                 camera.position.z = 10;
