@@ -11,10 +11,23 @@
 
 .header-content {
     display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: 100%;
+    width: 100%;
+}
+
+.header-left {
+    display: flex;
     flex-direction: column;
     gap: 0.3rem;
     align-items: flex-start;
-    max-width: 100%;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
 }
 
 .main-title {
@@ -40,6 +53,33 @@
     margin-top: 0.2rem;
 }
 
+.github-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.github-link:hover {
+    color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.github-link svg {
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s ease;
+}
+
+.github-link:hover svg {
+    transform: scale(1.1);
+}
+
 /* Hover effect per l'header */
 .app-header:hover .main-title {
     text-shadow:
@@ -62,6 +102,15 @@
         font-size: clamp(0.8rem, 2.5vw, 1rem);
         margin-top: 0;
     }
+
+    .github-link {
+        padding: 0.4rem;
+    }
+
+    .github-link svg {
+        width: 20px;
+        height: 20px;
+    }
 }
 
 @media screen and (max-width: 480px) {
@@ -75,5 +124,14 @@
 
     .subtitle {
         font-size: clamp(0.7rem, 3vw, 0.9rem);
+    }
+
+    .github-link {
+        padding: 0.3rem;
+    }
+
+    .github-link svg {
+        width: 18px;
+        height: 18px;
     }
 }
