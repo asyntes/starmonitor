@@ -162,13 +162,8 @@ export const fetchStarlinkAvailability = async (): Promise<void> => {
 
     let finalUrl: string;
 
-    // In development: use CORS proxy
-    // In production: use direct HTTPS URL (this code block gets removed in production build)
-    if (import.meta.env.DEV) {
-        finalUrl = `https://corsproxy.io/?${encodeURIComponent(starlinkUrl)}`;
-    } else {
-        finalUrl = starlinkUrl;
-    }
+    // Always use CORS proxy since Starlink API doesn't provide CORS headers
+    finalUrl = `https://corsproxy.io/?${encodeURIComponent(starlinkUrl)}`;
 
     try {
         const response = await fetch(finalUrl);
