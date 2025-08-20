@@ -126,8 +126,8 @@ export const useThreeScene = (
         renderer.domElement.addEventListener('click', handleClick);
         renderer.domElement.addEventListener('touchstart', handleClick);
 
-        loadGeographicData().then((geoData) => {
-            drawGeographicBorders(scene, geoData);
+        loadGeographicData().then(async (geoData) => {
+            await drawGeographicBorders(scene, geoData);
 
             fetchTLEData()
                 .then(tleData => {
