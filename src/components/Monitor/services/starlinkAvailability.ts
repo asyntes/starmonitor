@@ -185,6 +185,21 @@ export const fetchStarlinkAvailability = async (): Promise<void> => {
 const getCountryCode = (feature: GeoFeature): string | null => {
     if (!feature.properties) return null;
 
+    // Special case for Kosovo: GeoJSON uses KO but Starlink API uses XK
+    if (feature.properties.iso_a2 === 'KO' || 
+        feature.properties.postal === 'KO' || 
+        feature.properties.sovereignt === 'Kosovo' ||
+        feature.properties.NAME === 'Kosovo') {
+        return 'XK';
+    }
+
+    // Special case for Northern Cyprus: should map to Cyprus (CY) not China (CN)
+    if (feature.properties.NAME === 'N. Cyprus' || 
+        feature.properties.name === 'N. Cyprus' ||
+        feature.properties.NAME === 'Northern Cyprus') {
+        return 'CY';
+    }
+
     // First try direct ISO codes from GeoJSON
     const isoFields = ['iso_a2', 'postal', 'ISO_A2', 'wb_a2'];
     for (const field of isoFields) {
@@ -232,7 +247,7 @@ export const getStarlinkStatus = (feature: GeoFeature): StarlinkStatus => {
 
     const status = countryData.status;
     
-    if (status === 'launched' || status === 'available') {
+    if (status === 'launched' || status === 'available' || status === 'exclude') {
         return 'available';
     } else if (status === 'coming_soon') {
         return 'coming_soon';
@@ -241,13 +256,4 @@ export const getStarlinkStatus = (feature: GeoFeature): StarlinkStatus => {
     }
     
     return 'unavailable';
-};
-
-export const hasStarlinkBanned = (feature: GeoFeature): boolean => {
-    return getStarlinkStatus(feature) === 'unavailable';
-};
-
-export const hasStarlinkRestricted = (feature: GeoFeature): boolean => {
-    const status = getStarlinkStatus(feature);
-    return status === 'waiting_list' || status === 'coming_soon';
 };

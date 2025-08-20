@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getStarlinkStatus, fetchStarlinkAvailability, type StarlinkStatus, type GeoFeature } from '../constants/bannedCountries';
+import { getStarlinkStatus, fetchStarlinkAvailability, type StarlinkStatus, type GeoFeature } from '../services/starlinkAvailability';
 
 interface ExtendedGeoFeature extends GeoFeature {
     geometry?: {

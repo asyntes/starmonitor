@@ -16,14 +16,6 @@ const OrientationWarning: React.FC = () => {
             
             const isPhone = ('ontouchstart' in window) && !isTablet;
 
-            console.log('Orientation check:', {
-                isLandscape,
-                isPhone,
-                isTablet,
-                width,
-                height,
-                hasTouch: 'ontouchstart' in window
-            });
 
             setShouldShowWarning(isPhone && isLandscape);
         };
