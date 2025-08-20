@@ -158,21 +158,16 @@ const COUNTRY_NAME_TO_CODE_MAP: Record<string, string> = {
 };
 
 export const fetchStarlinkAvailability = async (): Promise<void> => {
-    const starlinkUrl = 'https://www.starlink.com/public-files/availability.json';
-
-    let finalUrl: string;
-
-    // Always use CORS proxy since Starlink API doesn't provide CORS headers
-    finalUrl = `https://corsproxy.io/?${encodeURIComponent(starlinkUrl)}`;
+    const localUrl = '/json/availability.json';  // Percorso relativo alla root public
 
     try {
-        const response = await fetch(finalUrl);
+        const response = await fetch(localUrl);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         availabilityData = await response.json();
     } catch (error) {
-        console.error('Error fetching Starlink availability data:', error);
+        console.error('Error loading Starlink availability data:', error);
         availabilityData = null;
     }
 };
