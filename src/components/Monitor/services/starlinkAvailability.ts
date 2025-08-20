@@ -186,21 +186,20 @@ const getCountryCode = (feature: GeoFeature): string | null => {
     if (!feature.properties) return null;
 
     // Special case for Kosovo: GeoJSON uses KO but Starlink API uses XK
-    if (feature.properties.iso_a2 === 'KO' || 
-        feature.properties.postal === 'KO' || 
+    if (feature.properties.iso_a2 === 'KO' ||
+        feature.properties.postal === 'KO' ||
         feature.properties.sovereignt === 'Kosovo' ||
         feature.properties.NAME === 'Kosovo') {
         return 'XK';
     }
 
-    // Special case for Northern Cyprus: should map to Cyprus (CY) not China (CN)
-    if (feature.properties.NAME === 'N. Cyprus' || 
+    // Special case for Northern Cyprus: should map to Turkey (TR)
+    if (feature.properties.NAME === 'N. Cyprus' ||
         feature.properties.name === 'N. Cyprus' ||
         feature.properties.NAME === 'Northern Cyprus') {
-        return 'CY';
+        return 'TR';
     }
 
-    // First try direct ISO codes from GeoJSON
     const isoFields = ['iso_a2', 'postal', 'ISO_A2', 'wb_a2'];
     for (const field of isoFields) {
         const value = feature.properties[field];
@@ -209,7 +208,6 @@ const getCountryCode = (feature: GeoFeature): string | null => {
         }
     }
 
-    // Then try name mapping
     const possibleNames = [
         feature.properties.NAME,
         feature.properties.name,
@@ -246,7 +244,7 @@ export const getStarlinkStatus = (feature: GeoFeature): StarlinkStatus => {
     }
 
     const status = countryData.status;
-    
+
     if (status === 'launched' || status === 'available' || status === 'exclude') {
         return 'available';
     } else if (status === 'coming_soon') {
@@ -254,6 +252,6 @@ export const getStarlinkStatus = (feature: GeoFeature): StarlinkStatus => {
     } else if (status === 'pending_regulatory' || status === 'faq' || status === 'unknown') {
         return 'waiting_list';
     }
-    
+
     return 'unavailable';
 };
