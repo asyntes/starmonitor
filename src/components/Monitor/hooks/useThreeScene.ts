@@ -5,11 +5,14 @@ import { createCleanSpaceSkybox, setupLighting, createEarth, updateComets } from
 import { loadGeographicData, drawGeographicBorders } from '../utils/geoUtils';
 import { fetchTLEData, createSatellitePoints, getSatellitePosition } from '../utils/satelliteUtils';
 import { updateUFO, forceUFODisappear, getUFOGroup } from '../utils/ufoUtils';
+import { NoisePass } from '../utils/noiseUtils';
+import type { NoiseConfig } from '../utils/noiseUtils';
 
 export const useThreeScene = (
     mountRef: React.RefObject<HTMLDivElement | null>,
     setSatelliteCount: (count: number) => void,
-    setIsLoading: (loading: boolean) => void
+    setIsLoading: (loading: boolean) => void,
+    noiseConfig?: NoiseConfig
 ) => {
     useEffect(() => {
         const currentMount = mountRef.current;
@@ -18,6 +21,16 @@ export const useThreeScene = (
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer();
+        
+        const renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.LinearFilter,
+            format: THREE.RGBAFormat,
+            type: THREE.UnsignedByteType,
+            colorSpace: THREE.SRGBColorSpace
+        });
+        const noisePass = new NoisePass(window.innerWidth, window.innerHeight);
+        const currentNoiseConfig = noiseConfig || { intensity: 0.2, speed: 1.0, enabled: true };
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
@@ -28,6 +41,7 @@ export const useThreeScene = (
 
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
         currentMount.appendChild(renderer.domElement);
 
         createCleanSpaceSkybox(scene);
@@ -198,7 +212,17 @@ export const useThreeScene = (
             updateUFO(scene, deltaTime * 0.016);
 
             controls.update();
-            renderer.render(scene, camera);
+            
+            if (currentNoiseConfig.enabled) {
+                renderer.setRenderTarget(renderTarget);
+                renderer.render(scene, camera);
+                
+                noisePass.updateTime(time * 0.001);
+                noisePass.setIntensity(currentNoiseConfig.intensity);
+                noisePass.render(renderer, renderTarget.texture);
+            } else {
+                renderer.render(scene, camera);
+            }
         };
         animate(0);
 
@@ -208,6 +232,9 @@ export const useThreeScene = (
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                
+                renderTarget.setSize(window.innerWidth, window.innerHeight);
+                noisePass.setSize(window.innerWidth, window.innerHeight);
 
                 if (!isUserInteracting) {
                     setupCameraAndScene();
@@ -229,7 +256,9 @@ export const useThreeScene = (
             cancelAnimationFrame(animationFrameId);
             controls.dispose();
             renderer.dispose();
+            renderTarget.dispose();
+            noisePass.dispose();
             cleanupFunctions.forEach(cleanup => cleanup());
         };
-    }, [mountRef, setSatelliteCount, setIsLoading]);
+    }, [mountRef, setSatelliteCount, setIsLoading, noiseConfig]);
 };
