@@ -247,9 +247,9 @@ export const getStarlinkStatus = (feature: GeoFeature): StarlinkStatus => {
 
     if (status === 'launched' || status === 'available' || status === 'exclude') {
         return 'available';
-    } else if (status === 'coming_soon') {
+    } else if (status === 'coming_soon' || status === 'unknown') {
         return 'coming_soon';
-    } else if (status === 'pending_regulatory' || status === 'faq' || status === 'unknown') {
+    } else if (status === 'pending_regulatory' || status === 'faq') {
         return 'waiting_list';
     }
 

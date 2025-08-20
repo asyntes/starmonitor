@@ -165,8 +165,8 @@ const createTextTexture = (text: string, category: StarlinkStatus): THREE.Canvas
 };
 
 const EXCLUDED_COUNTRIES = new Set([
-    'Israel', 'Palestine', 'Palestinian Territory', 'West Bank', 'Gaza Strip',
-    'Gaza', 'Palestinian Territories', 'State of Palestine'
+    'Palestine', 'Palestinian Territory', 'West Bank', 'Gaza Strip',
+    'Gaza', 'Palestinian Territories', 'State of Palestine', 'Israel'
 ]);
 
 const shouldExcludeCountry = (name: string): boolean => {
