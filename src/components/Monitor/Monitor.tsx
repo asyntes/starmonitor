@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { useThreeScene } from './hooks/useThreeScene';
 import { useSatelliteData } from './hooks/useSatelliteData';
-import type { NoiseConfig } from './utils/noiseUtils';
 import SatelliteCounter from '../SatelliteCounter/SatelliteCounter';
 import Legend from '../Legend/Legend';
 
@@ -12,14 +11,8 @@ interface MonitorProps {
 const Monitor: React.FC<MonitorProps> = ({ onLoadingStateChange }) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const { satelliteCount, isLoading, setSatelliteCount, setIsLoading } = useSatelliteData();
-    
-    const grainConfig: NoiseConfig = {
-        intensity: 0.15,
-        speed: 1.0,
-        enabled: true
-    };
 
-    useThreeScene(mountRef, setSatelliteCount, setIsLoading, grainConfig);
+    useThreeScene(mountRef, setSatelliteCount, setIsLoading);
 
     useEffect(() => {
         onLoadingStateChange(isLoading);
