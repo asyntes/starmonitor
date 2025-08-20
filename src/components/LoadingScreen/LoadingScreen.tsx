@@ -31,7 +31,6 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ isLoading, onLoadingCompl
     useEffect(() => {
         const fallbackTimer = setTimeout(() => {
             if (shouldShow && !fadeOut) {
-                console.log('Loading screen timeout - forcing close');
                 setFadeOut(true);
                 setTimeout(() => {
                     setShouldShow(false);

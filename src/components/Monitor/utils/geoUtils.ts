@@ -1,5 +1,16 @@
 import * as THREE from 'three';
-import { hasStarlinkBanned, hasStarlinkRestricted } from '../constants/bannedCountries';
+import { getStarlinkStatus, fetchStarlinkAvailability, type StarlinkStatus, type GeoFeature } from '../services/starlinkAvailability';
+
+interface ExtendedGeoFeature extends GeoFeature {
+    geometry?: {
+        type: string;
+        coordinates: unknown;
+    };
+}
+
+interface GeoData {
+    features?: ExtendedGeoFeature[];
+}
 
 
 export const loadGeographicData = async () => {
@@ -63,7 +74,7 @@ const calculatePolygonCentroid = (coordinates: number[][]): { lat: number; lon: 
     };
 };
 
-const calculateFeatureCentroid = (feature: any): { lat: number; lon: number } => {
+const calculateFeatureCentroid = (feature: ExtendedGeoFeature): { lat: number; lon: number } => {
     if (!feature.geometry || !feature.geometry.coordinates) {
         return { lat: 0, lon: 0 };
     }
@@ -71,18 +82,18 @@ const calculateFeatureCentroid = (feature: any): { lat: number; lon: number } =>
     const { type, coordinates } = feature.geometry;
 
     if (type === 'Polygon') {
-        return calculatePolygonCentroid(coordinates[0]);
+        return calculatePolygonCentroid((coordinates as unknown[][])[0] as number[][]);
     } else if (type === 'MultiPolygon') {
-        let largestPolygon = coordinates[0][0];
+        let largestPolygon = ((coordinates as unknown[][])[0] as unknown[])[0] as number[][];
         let largestArea = 0;
 
-        coordinates.forEach((polygon: any) => {
-            const ring = polygon[0];
+        (coordinates as unknown[][]).forEach((polygon: unknown[]) => {
+            const ring = polygon[0] as number[][];
             let area = 0;
 
             for (let i = 0; i < ring.length - 1; i++) {
-                const [x0, y0] = ring[i];
-                const [x1, y1] = ring[i + 1];
+                const [x0, y0] = ring[i] as [number, number];
+                const [x1, y1] = ring[i + 1] as [number, number];
                 area += Math.abs(x0 * y1 - x1 * y0);
             }
 
@@ -109,7 +120,7 @@ const geoToCartesian = (lat: number, lon: number, radius: number = 5.02): THREE.
     return new THREE.Vector3(x, y, z);
 };
 
-const createTextTexture = (text: string, category: 'normal' | 'restricted' | 'banned'): THREE.CanvasTexture => {
+const createTextTexture = (text: string, category: StarlinkStatus): THREE.CanvasTexture => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
@@ -126,12 +137,16 @@ const createTextTexture = (text: string, category: 'normal' | 'restricted' | 'ba
 
     let textColor: string;
     switch (category) {
-        case 'banned':
+        case 'unavailable':
             textColor = '#ff0000';
             break;
-        case 'restricted':
-            textColor = '#ff8800';
+        case 'waiting_list':
+            textColor = '#00aaff';
             break;
+        case 'coming_soon':
+            textColor = '#ffaa00';
+            break;
+        case 'available':
         default:
             textColor = '#ffffff';
             break;
@@ -150,20 +165,20 @@ const createTextTexture = (text: string, category: 'normal' | 'restricted' | 'ba
 };
 
 const EXCLUDED_COUNTRIES = new Set([
-    'Israel', 'Palestine', 'Palestinian Territory', 'West Bank', 'Gaza Strip',
-    'Gaza', 'Palestinian Territories', 'State of Palestine'
+    'Palestine', 'Palestinian Territory', 'West Bank', 'Gaza Strip',
+    'Gaza', 'Palestinian Territories', 'State of Palestine', 'Israel'
 ]);
 
 const shouldExcludeCountry = (name: string): boolean => {
     return EXCLUDED_COUNTRIES.has(name);
 };
 
-const addCountryLabel = (scene: THREE.Scene, name: string, centroid: { lat: number; lon: number }, category: 'normal' | 'restricted' | 'banned') => {
+const addCountryLabel = (scene: THREE.Scene, name: string, centroid: { lat: number; lon: number }, category: StarlinkStatus) => {
     if (shouldExcludeCountry(name)) {
         return;
     }
 
-    let displayName = name;
+    const displayName = name;
 
     const position = geoToCartesian(centroid.lat, centroid.lon);
     const texture = createTextTexture(displayName, category);
@@ -177,7 +192,7 @@ const addCountryLabel = (scene: THREE.Scene, name: string, centroid: { lat: numb
 
     const sprite = new THREE.Sprite(material);
 
-    let scale = 1.1;
+    const scale = 1.1;
 
     sprite.scale.set(scale, scale * 0.25, 1);
     sprite.position.copy(position);
@@ -187,28 +202,40 @@ const addCountryLabel = (scene: THREE.Scene, name: string, centroid: { lat: numb
     scene.add(sprite);
 };
 
-export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
+export const drawGeographicBorders = async (scene: THREE.Scene, geoData: GeoData) => {
     if (!geoData || !geoData.features) {
         console.error('Dati GeoJSON non validi');
         return;
     }
 
-    const bannedFeatures: any[] = [];
-    const restrictedFeatures: any[] = [];
-    const normalFeatures: any[] = [];
+    await fetchStarlinkAvailability();
 
-    geoData.features.forEach((feature: any) => {
-        if (hasStarlinkBanned(feature)) {
-            bannedFeatures.push(feature);
-        } else if (hasStarlinkRestricted(feature)) {
-            restrictedFeatures.push(feature);
-        } else {
-            normalFeatures.push(feature);
+    const availableFeatures: ExtendedGeoFeature[] = [];
+    const waitingListFeatures: ExtendedGeoFeature[] = [];
+    const comingSoonFeatures: ExtendedGeoFeature[] = [];
+    const unavailableFeatures: ExtendedGeoFeature[] = [];
+
+    geoData.features.forEach((feature: ExtendedGeoFeature) => {
+        const status = getStarlinkStatus(feature);
+        switch (status) {
+            case 'available':
+                availableFeatures.push(feature);
+                break;
+            case 'waiting_list':
+                waitingListFeatures.push(feature);
+                break;
+            case 'coming_soon':
+                comingSoonFeatures.push(feature);
+                break;
+            case 'unavailable':
+            default:
+                unavailableFeatures.push(feature);
+                break;
         }
     });
 
-    const drawFeatures = (features: any[], category: 'normal' | 'restricted' | 'banned') => {
-        features.forEach((feature: any) => {
+    const drawFeatures = (features: ExtendedGeoFeature[], category: StarlinkStatus) => {
+        features.forEach((feature: ExtendedGeoFeature) => {
             if (!feature.geometry || !feature.geometry.coordinates) return;
 
             const coordinates = feature.geometry.type === 'Polygon'
@@ -217,14 +244,14 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
 
             const centroid = calculateFeatureCentroid(feature);
 
-            const name = feature.properties?.NAME ||
+            const name = (feature.properties?.NAME ||
                 feature.properties?.name ||
                 feature.properties?.ADMIN ||
                 feature.properties?.NAME_EN ||
                 feature.properties?.SOVEREIGNT ||
                 feature.properties?.GEOUNIT ||
                 feature.properties?.NAME_LONG ||
-                'Unknown';
+                'Unknown') as string;
 
             if (name && name !== 'Unknown' && name.length > 2 &&
                 !isNaN(centroid.lat) && !isNaN(centroid.lon) &&
@@ -277,27 +304,31 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                         lat: 3.5,
                         lon: -53.0
                     };
-                    addCountryLabel(scene, 'French Guiana', frenchGuianaCentroid, 'restricted');
+                    addCountryLabel(scene, 'French Guiana', frenchGuianaCentroid, getStarlinkStatus({ properties: { NAME: 'French Guiana' } }));
                 }
             }
 
-            coordinates.forEach((polygon: any) => {
-                if (!polygon || !polygon[0]) return;
+            (coordinates as unknown[][]).forEach((polygon: unknown[]) => {
+                if (!polygon || !(polygon as unknown[])[0]) return;
 
-                const ring = polygon[0];
-                const points: THREE.Vector3[] = ring.map((coord: [number, number]) => {
-                    const [lon, lat] = coord;
+                const ring = (polygon as unknown[])[0] as number[][];
+                const points: THREE.Vector3[] = ring.map((coord) => {
+                    const [lon, lat] = coord as [number, number];
                     const phi = (90 - lat) * Math.PI / 180;
                     const theta = -lon * Math.PI / 180;
 
                     let radius: number;
                     switch (category) {
-                        case 'banned':
+                        case 'unavailable':
                             radius = 5.015;
                             break;
-                        case 'restricted':
+                        case 'waiting_list':
+                            radius = 5.013;
+                            break;
+                        case 'coming_soon':
                             radius = 5.012;
                             break;
+                        case 'available':
                         default:
                             radius = 5.01;
                             break;
@@ -320,18 +351,25 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                     let renderOrder = 0;
 
                     switch (category) {
-                        case 'banned':
+                        case 'unavailable':
                             lineColor = 0xff0000;
                             lineWidth = 3;
                             opacity = 1.0;
                             renderOrder = 1000;
                             break;
-                        case 'restricted':
-                            lineColor = 0xff8800;
+                        case 'waiting_list':
+                            lineColor = 0x00aaff;
+                            lineWidth = 2;
+                            opacity = 0.9;
+                            renderOrder = 750;
+                            break;
+                        case 'coming_soon':
+                            lineColor = 0xffaa00;
                             lineWidth = 2;
                             opacity = 0.9;
                             renderOrder = 500;
                             break;
+                        case 'available':
                         default:
                             lineColor = 0xffffff;
                             lineWidth = 1;
@@ -345,7 +383,7 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
                         opacity: opacity,
                         transparent: true,
                         linewidth: lineWidth,
-                        depthWrite: category !== 'normal',
+                        depthWrite: category !== 'available',
                         depthTest: true
                     });
 
@@ -358,7 +396,8 @@ export const drawGeographicBorders = (scene: THREE.Scene, geoData: any) => {
         });
     };
 
-    drawFeatures(normalFeatures, 'normal');
-    drawFeatures(restrictedFeatures, 'restricted');
-    drawFeatures(bannedFeatures, 'banned');
+    drawFeatures(availableFeatures, 'available');
+    drawFeatures(comingSoonFeatures, 'coming_soon');
+    drawFeatures(waitingListFeatures, 'waiting_list');
+    drawFeatures(unavailableFeatures, 'unavailable');
 };
