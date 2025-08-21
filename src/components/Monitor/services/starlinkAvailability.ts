@@ -235,12 +235,10 @@ export const getStarlinkStatus = (feature: GeoFeature): StarlinkStatus => {
 
     const status = countryData.status;
 
-    if (status === 'launched' || status === 'available' || status === 'exclude') {
+    if (status === 'launched' || status === 'available' || status === 'faq' || status === 'exclude') {
         return 'available';
-    } else if (status === 'coming_soon' || status === 'unknown') {
+    } else if (status === 'coming_soon' || status === 'unknown' || status === 'pending_regulatory') {
         return 'coming_soon';
-    } else if (status === 'pending_regulatory' || status === 'faq') {
-        return 'waiting_list';
     }
 
     return 'unavailable';

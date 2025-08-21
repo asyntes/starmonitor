@@ -11,10 +11,6 @@ const Legend: React.FC = () => {
                     <span className="legend-label">Available</span>
                 </div>
                 <div className="legend-item">
-                    <div className="legend-color waiting-list"></div>
-                    <span className="legend-label">Waiting List</span>
-                </div>
-                <div className="legend-item">
                     <div className="legend-color coming-soon"></div>
                     <span className="legend-label">Coming Soon</span>
                 </div>

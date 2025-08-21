@@ -20,7 +20,7 @@ export const createUFO = (): THREE.Group => {
     const saucerGeometry = new THREE.SphereGeometry(0.15, 16, 8);
     saucerGeometry.scale(1, 0.3, 1);
     const saucerMaterial = new THREE.MeshPhongMaterial({
-        color: 0x888888,
+        color: 0xaaaaaa,
         shininess: 100,
         transparent: true,
         opacity: 1.0
@@ -30,7 +30,7 @@ export const createUFO = (): THREE.Group => {
 
     const domeGeometry = new THREE.SphereGeometry(0.08, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
     const domeMaterial = new THREE.MeshPhongMaterial({
-        color: 0x444466,
+        color: 0x6666aa,
         transparent: true,
         opacity: 1.0,
         shininess: 200
@@ -41,7 +41,7 @@ export const createUFO = (): THREE.Group => {
 
     const lightGeometry = new THREE.SphereGeometry(0.02, 8, 6);
     const lightMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00ff88,
+        color: 0x44ffaa,
         transparent: true,
         opacity: 1.0
     });
@@ -228,7 +228,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
         if (!ufo.fadingOut && !ufo.fadingIn) {
             const lights = ufo.group.children.filter(child =>
                 child instanceof THREE.Mesh &&
-                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x00ff88
+                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x44ffaa
             );
 
             lights.forEach((light, index) => {
