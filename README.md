@@ -8,11 +8,11 @@
 - **Service Availability Map**: Starlink service status by country (manually updated from static data)
 - **Dynamic Country Classification**:
   - ⚪ **Available**: Countries with active Starlink service
-  - 🔵 **Coming Soon**: Countries with planned service rollout
-  - 🟠 **Waiting List**: Countries pending regulatory approval
+  - 🟠 **Coming Soon**: Countries with planned service rollout
   - 🔴 **Unavailable**: Countries without service access
 - **Mobile Responsive**: Optimized for desktop, tablet, and mobile devices
 - **Real-time Counter**: Live satellite count display
+- **UFO Easter Egg**: Hidden UFO that occasionally appears and flies around Earth
 
 ## Tech Stack
 
@@ -33,7 +33,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5174` in your browser.
+Open `http://localhost:5173` in your browser.
 
 ## How It Works
 

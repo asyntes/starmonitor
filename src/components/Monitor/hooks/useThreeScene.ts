@@ -40,6 +40,8 @@ export const useThreeScene = (
         const noisePass = new NoisePass(window.innerWidth, window.innerHeight);
         noisePass.setIntensity(0.15);
         noisePass.setEnabled(true);
+        noisePass.setInterferenceIntensity(0.4);
+        noisePass.setInterferenceFrequency(0.08);
 
         createCleanSpaceSkybox(scene);
         setupLighting(scene);
@@ -54,10 +56,10 @@ export const useThreeScene = (
             const isLandscape = width > height;
             const maxDimension = Math.max(width, height);
             const minDimension = Math.min(width, height);
-            
-            const isTablet = (maxDimension > 768 && maxDimension <= 1024) || 
-                           (minDimension > 600 && maxDimension <= 1366);
-            
+
+            const isTablet = (maxDimension > 768 && maxDimension <= 1024) ||
+                (minDimension > 600 && maxDimension <= 1366);
+
             if (isTablet) {
                 return isLandscape ? 'tablet-landscape' : 'tablet-portrait';
             } else if (maxDimension <= 768) {
@@ -70,7 +72,7 @@ export const useThreeScene = (
         const setupCameraAndScene = () => {
             const deviceType = getDeviceType();
             const aspectRatio = window.innerWidth / window.innerHeight;
-            
+
             if (deviceType === 'phone') {
                 if (aspectRatio < 0.5) {
                     scene.position.y = 2.5;
@@ -108,9 +110,9 @@ export const useThreeScene = (
 
         const handleClick = (event: MouseEvent | TouchEvent) => {
             event.preventDefault();
-            
+
             let clientX: number, clientY: number;
-            
+
             if ('touches' in event) {
                 if (event.touches.length === 0) return;
                 clientX = event.touches[0].clientX;
@@ -119,12 +121,12 @@ export const useThreeScene = (
                 clientX = event.clientX;
                 clientY = event.clientY;
             }
-            
+
             mouse.x = (clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-            
+
             raycaster.setFromCamera(mouse, camera);
-            
+
             const ufoGroup = getUFOGroup();
             if (ufoGroup) {
                 const intersects = raycaster.intersectObjects(ufoGroup.children, true);
@@ -187,6 +189,7 @@ export const useThreeScene = (
         let animationFrameId: number;
         const cleanupFunctions: (() => void)[] = [];
         let lastTime = 0;
+        let lastInterferenceCheck = 0;
 
         const animate = (time: number) => {
             animationFrameId = requestAnimationFrame(animate);
@@ -208,13 +211,23 @@ export const useThreeScene = (
             updateComets(scene, deltaTime * 0.016);
             updateUFO(scene, deltaTime * 0.016);
 
+            if (time - lastInterferenceCheck > 8000 + Math.random() * 25000) {
+                lastInterferenceCheck = time;
+                if (Math.random() < 0.3) {
+                    noisePass.setInterferenceFrequency(2.5);
+                    setTimeout(() => {
+                        noisePass.setInterferenceFrequency(0.0);
+                    }, 800);
+                }
+            }
+
             noisePass.updateTime(time * 0.001);
 
             controls.update();
-            
+
             renderer.setRenderTarget(renderTarget);
             renderer.render(scene, camera);
-            
+
             noisePass.render(renderer, renderTarget.texture, null);
         };
         animate(0);
@@ -225,7 +238,7 @@ export const useThreeScene = (
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                
+
                 renderTarget.setSize(window.innerWidth, window.innerHeight);
                 noisePass.setSize(window.innerWidth, window.innerHeight);
 
