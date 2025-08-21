@@ -211,15 +211,6 @@ export const useThreeScene = (
             updateComets(scene, deltaTime * 0.016);
             updateUFO(scene, deltaTime * 0.016);
 
-            if (time - lastInterferenceCheck > 8000 + Math.random() * 25000) {
-                lastInterferenceCheck = time;
-                if (Math.random() < 0.3) {
-                    noisePass.setInterferenceFrequency(2.5);
-                    setTimeout(() => {
-                        noisePass.setInterferenceFrequency(0.0);
-                    }, 800);
-                }
-            }
 
             noisePass.updateTime(time * 0.001);
 
