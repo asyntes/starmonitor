@@ -17,7 +17,7 @@ let ufoInstance: UFOInstance | null = null;
 export const createUFO = (): THREE.Group => {
     const ufoGroup = new THREE.Group();
 
-    const saucerGeometry = new THREE.SphereGeometry(0.15, 16, 8);
+    const saucerGeometry = new THREE.SphereGeometry(0.25, 16, 8);
     saucerGeometry.scale(1, 0.3, 1);
     const saucerMaterial = new THREE.MeshPhongMaterial({
         color: 0xaaaaaa,
@@ -28,7 +28,7 @@ export const createUFO = (): THREE.Group => {
     (saucerMaterial as THREE.MeshPhongMaterial & { originalOpacity: number }).originalOpacity = 1.0;
     const saucer = new THREE.Mesh(saucerGeometry, saucerMaterial);
 
-    const domeGeometry = new THREE.SphereGeometry(0.08, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
+    const domeGeometry = new THREE.SphereGeometry(0.13, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
     const domeMaterial = new THREE.MeshPhongMaterial({
         color: 0x725097,
         transparent: true,
@@ -37,11 +37,11 @@ export const createUFO = (): THREE.Group => {
     });
     (domeMaterial as THREE.MeshPhongMaterial & { originalOpacity: number }).originalOpacity = 0.9;
     const dome = new THREE.Mesh(domeGeometry, domeMaterial);
-    dome.position.y = 0.03;
+    dome.position.y = 0.05;
 
-    const lightGeometry = new THREE.SphereGeometry(0.02, 8, 6);
+    const lightGeometry = new THREE.SphereGeometry(0.035, 8, 6);
     const lightMaterial = new THREE.MeshBasicMaterial({
-        color: 0x44ffaa,
+        color: 0x00ccaa,
         transparent: true,
         opacity: 1.0
     });
@@ -51,9 +51,9 @@ export const createUFO = (): THREE.Group => {
         const angle = (i / 6) * Math.PI * 2;
         const light = new THREE.Mesh(lightGeometry, lightMaterial.clone());
         (light.material as THREE.MeshBasicMaterial & { originalOpacity: number }).originalOpacity = 1.0;
-        light.position.x = Math.cos(angle) * 0.12;
-        light.position.z = Math.sin(angle) * 0.12;
-        light.position.y = -0.03;
+        light.position.x = Math.cos(angle) * 0.20;
+        light.position.z = Math.sin(angle) * 0.20;
+        light.position.y = -0.05;
         ufoGroup.add(light);
     }
 
@@ -228,7 +228,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
         if (!ufo.fadingOut && !ufo.fadingIn) {
             const lights = ufo.group.children.filter(child =>
                 child instanceof THREE.Mesh &&
-                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x44ffaa
+                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x00ccaa
             );
 
             lights.forEach((light, index) => {
