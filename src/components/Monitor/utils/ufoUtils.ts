@@ -30,12 +30,12 @@ export const createUFO = (): THREE.Group => {
 
     const domeGeometry = new THREE.SphereGeometry(0.08, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
     const domeMaterial = new THREE.MeshPhongMaterial({
-        color: 0x6666aa,
+        color: 0x725097,
         transparent: true,
-        opacity: 1.0,
+        opacity: 0.9,
         shininess: 200
     });
-    (domeMaterial as THREE.MeshPhongMaterial & { originalOpacity: number }).originalOpacity = 1.0;
+    (domeMaterial as THREE.MeshPhongMaterial & { originalOpacity: number }).originalOpacity = 0.9;
     const dome = new THREE.Mesh(domeGeometry, domeMaterial);
     dome.position.y = 0.03;
 
@@ -158,7 +158,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             const fadeElapsed = now - ufo.fadeInStartTime;
             const fadeDuration = 2000;
             const fadeProgress = Math.min(fadeElapsed / fadeDuration, 1);
-            
+
             ufo.group.children.forEach(child => {
                 if (child instanceof THREE.Mesh && child.material) {
                     const material = child.material as THREE.Material & { opacity?: number };
