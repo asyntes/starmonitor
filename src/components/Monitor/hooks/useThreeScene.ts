@@ -83,7 +83,7 @@ export const useThreeScene = (
                     camera.position.z = 15;
                     camera.position.y = 2;
                 }
-                controls.minDistance = 5;
+                controls.minDistance = 8;
             } else if (deviceType === 'tablet-portrait') {
                 scene.position.y = 2;
                 camera.position.z = 18;
@@ -93,7 +93,7 @@ export const useThreeScene = (
                 scene.position.y = 0;
                 camera.position.z = 10;
                 camera.position.y = 2;
-                controls.minDistance = 3;
+                controls.minDistance = 6;
             }
             controls.update();
         };
