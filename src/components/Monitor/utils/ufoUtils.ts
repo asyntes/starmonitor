@@ -41,7 +41,7 @@ export const createUFO = (): THREE.Group => {
 
     const lightGeometry = new THREE.SphereGeometry(0.035, 8, 6);
     const lightMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00ccaa,
+        color: 0x87ceeb,
         transparent: true,
         opacity: 1.0
     });
@@ -228,7 +228,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
         if (!ufo.fadingOut && !ufo.fadingIn) {
             const lights = ufo.group.children.filter(child =>
                 child instanceof THREE.Mesh &&
-                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x00ccaa
+                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x87ceeb
             );
 
             lights.forEach((light, index) => {
