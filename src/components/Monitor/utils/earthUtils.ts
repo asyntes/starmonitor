@@ -90,12 +90,8 @@ export const createCleanSpaceSkybox = (scene: THREE.Scene) => {
 };
 
 export const setupLighting = (scene: THREE.Scene) => {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 3, 5);
-    scene.add(directionalLight);
 };
 
 export const createEarth = (scene: THREE.Scene) => {

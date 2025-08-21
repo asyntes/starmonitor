@@ -189,7 +189,6 @@ export const useThreeScene = (
         let animationFrameId: number;
         const cleanupFunctions: (() => void)[] = [];
         let lastTime = 0;
-        let lastInterferenceCheck = 0;
 
         const animate = (time: number) => {
             animationFrameId = requestAnimationFrame(animate);
@@ -211,15 +210,6 @@ export const useThreeScene = (
             updateComets(scene, deltaTime * 0.016);
             updateUFO(scene, deltaTime * 0.016);
 
-            if (time - lastInterferenceCheck > 8000 + Math.random() * 25000) {
-                lastInterferenceCheck = time;
-                if (Math.random() < 0.3) {
-                    noisePass.setInterferenceFrequency(2.5);
-                    setTimeout(() => {
-                        noisePass.setInterferenceFrequency(0.0);
-                    }, 800);
-                }
-            }
 
             noisePass.updateTime(time * 0.001);
 
