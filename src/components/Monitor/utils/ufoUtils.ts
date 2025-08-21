@@ -71,7 +71,7 @@ export const shouldSpawnUFO = (): boolean => {
         return false;
     }
 
-    if (!ufoInstance && Math.random() < 0.01) {
+    if (!ufoInstance && Math.random() < 0.001) {
         return true;
     }
 
@@ -174,7 +174,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             }
         }
 
-        if (now - ufo.lastSpawn > 60000 && !ufo.fadingOut && !ufo.fadingIn) {
+        if (now - ufo.lastSpawn > 20000 && !ufo.fadingOut && !ufo.fadingIn) {
             ufo.fadingOut = true;
             ufo.fadeStartTime = now;
         }
