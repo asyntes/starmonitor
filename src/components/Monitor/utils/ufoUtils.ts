@@ -20,37 +20,37 @@ export const createUFO = (): THREE.Group => {
     const saucerGeometry = new THREE.SphereGeometry(0.15, 16, 8);
     saucerGeometry.scale(1, 0.3, 1);
     const saucerMaterial = new THREE.MeshPhongMaterial({
-        color: 0x888888,
+        color: 0xaaaaaa,
         shininess: 100,
         transparent: true,
         opacity: 1.0
     });
-    (saucerMaterial as any).originalOpacity = 1.0;
+    (saucerMaterial as THREE.MeshPhongMaterial & { originalOpacity: number }).originalOpacity = 1.0;
     const saucer = new THREE.Mesh(saucerGeometry, saucerMaterial);
 
     const domeGeometry = new THREE.SphereGeometry(0.08, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
     const domeMaterial = new THREE.MeshPhongMaterial({
-        color: 0x444466,
+        color: 0x6666aa,
         transparent: true,
         opacity: 1.0,
         shininess: 200
     });
-    (domeMaterial as any).originalOpacity = 1.0;
+    (domeMaterial as THREE.MeshPhongMaterial & { originalOpacity: number }).originalOpacity = 1.0;
     const dome = new THREE.Mesh(domeGeometry, domeMaterial);
     dome.position.y = 0.03;
 
     const lightGeometry = new THREE.SphereGeometry(0.02, 8, 6);
     const lightMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00ff88,
+        color: 0x44ffaa,
         transparent: true,
         opacity: 1.0
     });
-    (lightMaterial as any).originalOpacity = 1.0;
+    (lightMaterial as THREE.MeshBasicMaterial & { originalOpacity: number }).originalOpacity = 1.0;
 
     for (let i = 0; i < 6; i++) {
         const angle = (i / 6) * Math.PI * 2;
         const light = new THREE.Mesh(lightGeometry, lightMaterial.clone());
-        (light.material as any).originalOpacity = 1.0;
+        (light.material as THREE.MeshBasicMaterial & { originalOpacity: number }).originalOpacity = 1.0;
         light.position.x = Math.cos(angle) * 0.12;
         light.position.z = Math.sin(angle) * 0.12;
         light.position.y = -0.03;
@@ -163,7 +163,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
                 if (child instanceof THREE.Mesh && child.material) {
                     const material = child.material as THREE.Material & { opacity?: number };
                     if (material.opacity !== undefined) {
-                        const originalOpacity = (child.material as any).originalOpacity || 1;
+                        const originalOpacity = (child.material as THREE.Material & { originalOpacity?: number }).originalOpacity || 1;
                         material.opacity = fadeProgress * originalOpacity;
                     }
                 }
@@ -189,7 +189,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
                 if (child instanceof THREE.Mesh && child.material) {
                     const material = child.material as THREE.Material & { opacity?: number };
                     if (material.opacity !== undefined) {
-                        const originalOpacity = (child.material as any).originalOpacity || 1;
+                        const originalOpacity = (child.material as THREE.Material & { originalOpacity?: number }).originalOpacity || 1;
                         material.opacity = opacity * originalOpacity;
                     }
                 }
@@ -228,12 +228,12 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
         if (!ufo.fadingOut && !ufo.fadingIn) {
             const lights = ufo.group.children.filter(child =>
                 child instanceof THREE.Mesh &&
-                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x00ff88
+                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x44ffaa
             );
 
             lights.forEach((light, index) => {
                 const material = (light as THREE.Mesh).material as THREE.MeshBasicMaterial;
-                const originalOpacity = (material as any).originalOpacity || 1.0;
+                const originalOpacity = (material as THREE.MeshBasicMaterial & { originalOpacity?: number }).originalOpacity || 1.0;
                 material.opacity = originalOpacity * (0.5 + Math.sin(now * 0.01 + index) * 0.3);
             });
         }
