@@ -5,6 +5,7 @@ import { createCleanSpaceSkybox, setupLighting, createEarth, updateComets } from
 import { loadGeographicData, drawGeographicBorders } from '../utils/geoUtils';
 import { fetchTLEData, createSatellitePoints, getSatellitePosition } from '../utils/satelliteUtils';
 import { updateUFO, forceUFODisappear, getUFOGroup } from '../utils/ufoUtils';
+import { NoisePass } from '../utils/noiseUtils';
 
 export const useThreeScene = (
     mountRef: React.RefObject<HTMLDivElement | null>,
@@ -29,6 +30,16 @@ export const useThreeScene = (
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         currentMount.appendChild(renderer.domElement);
+
+        const renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.LinearFilter,
+            format: THREE.RGBAFormat
+        });
+
+        const noisePass = new NoisePass(window.innerWidth, window.innerHeight);
+        noisePass.setIntensity(0.15);
+        noisePass.setEnabled(true);
 
         createCleanSpaceSkybox(scene);
         setupLighting(scene);
@@ -197,8 +208,14 @@ export const useThreeScene = (
             updateComets(scene, deltaTime * 0.016);
             updateUFO(scene, deltaTime * 0.016);
 
+            noisePass.updateTime(time * 0.001);
+
             controls.update();
+            
+            renderer.setRenderTarget(renderTarget);
             renderer.render(scene, camera);
+            
+            noisePass.render(renderer, renderTarget.texture, null);
         };
         animate(0);
 
@@ -208,6 +225,9 @@ export const useThreeScene = (
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                
+                renderTarget.setSize(window.innerWidth, window.innerHeight);
+                noisePass.setSize(window.innerWidth, window.innerHeight);
 
                 if (!isUserInteracting) {
                     setupCameraAndScene();
@@ -229,6 +249,8 @@ export const useThreeScene = (
             cancelAnimationFrame(animationFrameId);
             controls.dispose();
             renderer.dispose();
+            renderTarget.dispose();
+            noisePass.dispose();
             cleanupFunctions.forEach(cleanup => cleanup());
         };
     }, [mountRef, setSatelliteCount, setIsLoading]);
