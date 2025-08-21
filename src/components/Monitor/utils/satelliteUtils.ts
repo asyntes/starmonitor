@@ -117,7 +117,7 @@ export const createSatellitePoints = (scene: THREE.Scene, tleData: TLEData[]) =>
 
     const material = new THREE.PointsMaterial({
         color: 0x00ff00,
-        size: 0.02,
+        size: 0.01,
         map: createCircleTexture(),
         transparent: true,
         alphaTest: 0.5
