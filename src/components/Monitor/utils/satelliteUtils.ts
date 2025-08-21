@@ -7,7 +7,7 @@ interface PositionAndVelocity {
     error?: string;
 }
 
-export const getSatellitePosition = (satrec: any, date: Date): THREE.Vector3 | null => {
+export const getSatellitePosition = (satrec: satellite.SatRec, date: Date): THREE.Vector3 | null => {
     const positionAndVelocity = satellite.propagate(satrec, date) as PositionAndVelocity | boolean;
     if (typeof positionAndVelocity !== 'object' || !positionAndVelocity || !positionAndVelocity.position) {
         return null;
@@ -43,7 +43,13 @@ export const createCircleTexture = (): THREE.CanvasTexture => {
     return new THREE.CanvasTexture(canvas);
 };
 
-export const fetchTLEData = async (): Promise<any[]> => {
+interface TLEData {
+    name: string;
+    tleLine1: string;
+    tleLine2: string;
+}
+
+export const fetchTLEData = async (): Promise<TLEData[]> => {
     const celestrakUrl = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle';
 
     let finalUrl: string;
@@ -84,9 +90,9 @@ export const fetchTLEData = async (): Promise<any[]> => {
     }
 };
 
-export const createSatellitePoints = (scene: THREE.Scene, tleData: any[]) => {
-    let posArray: number[] = [];
-    let satrecs: any[] = [];
+export const createSatellitePoints = (scene: THREE.Scene, tleData: TLEData[]) => {
+    const posArray: number[] = [];
+    const satrecs: satellite.SatRec[] = [];
 
     tleData.forEach((sat) => {
         const tleLine1 = sat.tleLine1;
