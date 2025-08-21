@@ -116,7 +116,7 @@ export const createSatellitePoints = (scene: THREE.Scene, tleData: TLEData[]) =>
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     const material = new THREE.PointsMaterial({
-        color: 0x009900,
+        color: 0x00ff00,
         size: 0.02,
         map: createCircleTexture(),
         transparent: true,
