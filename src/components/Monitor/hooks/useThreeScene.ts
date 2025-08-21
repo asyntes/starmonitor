@@ -189,7 +189,6 @@ export const useThreeScene = (
         let animationFrameId: number;
         const cleanupFunctions: (() => void)[] = [];
         let lastTime = 0;
-        let lastInterferenceCheck = 0;
 
         const animate = (time: number) => {
             animationFrameId = requestAnimationFrame(animate);
