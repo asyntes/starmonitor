@@ -86,6 +86,24 @@
     color: #aaa;
 }
 
+/* Tablet and desktop landscape: move to bottom-left */
+@media screen and (min-width: 769px) and (orientation: landscape) {
+    .satellite-counter {
+        bottom: 2rem;
+        left: 2rem;
+        right: auto;
+    }
+}
+
+/* Tablet portrait: move to bottom-left */
+@media screen and (min-width: 601px) and (max-width: 1366px) and (orientation: portrait) {
+    .satellite-counter {
+        bottom: 2rem;
+        left: 2rem;
+        right: auto;
+    }
+}
+
 /* Mobile: full width, stacked */
 @media screen and (max-width: 768px) {
     .satellite-counter {
