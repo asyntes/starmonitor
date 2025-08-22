@@ -56,8 +56,8 @@ export const useThreeScene = (
             const maxDimension = Math.max(width, height);
             const minDimension = Math.min(width, height);
 
-            const isTablet = (maxDimension > 768 && maxDimension <= 1024) &&
-                (minDimension > 600);
+            const isTablet = (maxDimension > 768 && maxDimension <= 1400) &&
+                (minDimension > 600 && minDimension <= 1024);
 
             if (isTablet) {
                 return 'tablet';
@@ -84,8 +84,13 @@ export const useThreeScene = (
                 }
                 controls.minDistance = 8;
             } else if (deviceType === 'tablet') {
-                scene.position.y = 0;
-                camera.position.z = 12;
+                if (aspectRatio < 1) {
+                    scene.position.y = 1;
+                    camera.position.z = 14;
+                } else {
+                    scene.position.y = 0;
+                    camera.position.z = 12;
+                }
                 controls.minDistance = 6;
             } else {
                 scene.position.y = 0;
