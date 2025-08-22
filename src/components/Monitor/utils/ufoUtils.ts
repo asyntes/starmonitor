@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-type UFOPhase = 'approaching' | 'hovering' | 'spinning' | 'leaving';
+type UFOPhase = 'approaching' | 'hovering' | 'abducting' | 'leaving';
 
 interface UFOInstance {
     group: THREE.Group;
@@ -35,6 +35,31 @@ export const createUFO = (): THREE.Group => {
     (saucerMaterial as THREE.MeshPhongMaterial & { originalOpacity: number }).originalOpacity = 1.0;
     const saucer = new THREE.Mesh(saucerGeometry, saucerMaterial);
 
+    const openingGeometry = new THREE.RingGeometry(0.06, 0.12, 16);
+    const openingMaterial = new THREE.MeshPhongMaterial({
+        color: 0x333333,
+        shininess: 50,
+        transparent: true,
+        opacity: 1.0,
+        side: THREE.DoubleSide
+    });
+    (openingMaterial as THREE.MeshPhongMaterial & { originalOpacity: number }).originalOpacity = 1.0;
+    const opening = new THREE.Mesh(openingGeometry, openingMaterial);
+    opening.position.y = -0.075;
+    opening.rotation.x = -Math.PI / 2;
+
+    const tractorBeamGeometry = new THREE.ConeGeometry(0.3, 1.5, 8, 1, true);
+    const tractorBeamMaterial = new THREE.MeshBasicMaterial({
+        color: 0x66cdaa,
+        transparent: true,
+        opacity: 0.0,
+        side: THREE.DoubleSide
+    });
+    (tractorBeamMaterial as THREE.MeshBasicMaterial & { originalOpacity: number }).originalOpacity = 0.3;
+    const tractorBeam = new THREE.Mesh(tractorBeamGeometry, tractorBeamMaterial);
+    tractorBeam.position.y = -0.8;
+    tractorBeam.rotation.x = 0;
+
     const domeGeometry = new THREE.SphereGeometry(0.13, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
     const domeMaterial = new THREE.MeshPhongMaterial({
         color: 0x725097,
@@ -67,6 +92,8 @@ export const createUFO = (): THREE.Group => {
 
     ufoGroup.add(saucer);
     ufoGroup.add(dome);
+    ufoGroup.add(opening);
+    ufoGroup.add(tractorBeam);
 
     return ufoGroup;
 };
@@ -247,6 +274,14 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
                     ufo.originalRotation.copy(ufo.group.rotation);
                 }
 
+                const tractorBeam = ufo.group.children.find(child => 
+                    child instanceof THREE.Mesh && 
+                    child.geometry instanceof THREE.ConeGeometry
+                );
+                if (tractorBeam) {
+                    tractorBeam.visible = false;
+                }
+
                 ufo.bobOffset += deltaTime * 2;
                 const bobAmount = Math.sin(ufo.bobOffset) * 0.01;
                 ufo.group.position.y += bobAmount;
@@ -260,18 +295,26 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
                 ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
                 ufo.group.rotateX(THREE.MathUtils.lerp(0, -Math.PI / 2, tiltProgress));
                 
+                const tractorBeam = ufo.group.children.find(child => 
+                    child instanceof THREE.Mesh && 
+                    child.geometry instanceof THREE.ConeGeometry
+                );
+                if (tractorBeam) {
+                    tractorBeam.visible = false;
+                }
+                
                 ufo.bobOffset += deltaTime * 2;
                 const bobAmount = Math.sin(ufo.bobOffset) * 0.015;
                 ufo.group.position.y += bobAmount;
 
                 if (phaseElapsed > 2000) {
-                    ufo.phase = 'spinning';
+                    ufo.phase = 'abducting';
                     ufo.phaseStartTime = now;
                 }
                 break;
             }
 
-            case 'spinning': {
+            case 'abducting': {
                 ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
                 ufo.group.rotateX(-Math.PI / 2);
                 ufo.group.rotateY(phaseElapsed * 0.02);
@@ -279,6 +322,17 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
                 ufo.bobOffset += deltaTime * 3;
                 const bobAmount = Math.sin(ufo.bobOffset) * 0.02;
                 ufo.group.position.y += bobAmount;
+
+                const tractorBeam = ufo.group.children.find(child => 
+                    child instanceof THREE.Mesh && 
+                    child.geometry instanceof THREE.ConeGeometry
+                );
+                if (tractorBeam) {
+                    tractorBeam.visible = true;
+                    const material = (tractorBeam as THREE.Mesh).material as THREE.MeshBasicMaterial;
+                    const targetOpacity = (material as THREE.MeshBasicMaterial & { originalOpacity?: number }).originalOpacity || 0.3;
+                    material.opacity = targetOpacity * (0.7 + Math.sin(now * 0.01) * 0.3);
+                }
 
                 if (phaseElapsed > 5000) {
                     ufo.phase = 'leaving';
@@ -290,6 +344,14 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
 
             case 'leaving': {
                 const restoreProgress = Math.min(phaseElapsed / 2000, 1);
+                
+                const tractorBeam = ufo.group.children.find(child => 
+                    child instanceof THREE.Mesh && 
+                    child.geometry instanceof THREE.ConeGeometry
+                );
+                if (tractorBeam) {
+                    tractorBeam.visible = false;
+                }
                 
                 if (restoreProgress < 1) {
                     ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
@@ -319,7 +381,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             }
         }
 
-        if (ufo.group.position.length() < 5.5 && ufo.phase !== 'hovering' && ufo.phase !== 'spinning') {
+        if (ufo.group.position.length() < 5.5 && ufo.phase !== 'hovering' && ufo.phase !== 'abducting') {
             ufo.group.position.normalize().multiplyScalar(5.5);
             if (ufo.phase === 'leaving') {
                 ufo.targetPosition = getRandomTargetPosition(ufo.group.position);
@@ -329,7 +391,8 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
         if (!ufo.fadingOut && !ufo.fadingIn) {
             const lights = ufo.group.children.filter(child =>
                 child instanceof THREE.Mesh &&
-                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x87ceeb
+                (child.material as THREE.MeshBasicMaterial).color.getHex() === 0x87ceeb &&
+                !(child.geometry instanceof THREE.ConeGeometry)
             );
 
             lights.forEach((light, index) => {
