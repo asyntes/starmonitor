@@ -56,12 +56,12 @@ export const useThreeScene = (
             const maxDimension = Math.max(width, height);
             const minDimension = Math.min(width, height);
 
-            const isTablet = (maxDimension > 768 && maxDimension <= 1024) ||
-                (minDimension > 600 && maxDimension <= 1366);
+            const isTablet = (maxDimension > 768 && maxDimension <= 1400) &&
+                (minDimension > 600 && minDimension <= 1024);
 
             if (isTablet) {
                 return 'tablet';
-            } else if (maxDimension <= 768) {
+            } else if (minDimension <= 500) {
                 return 'phone';
             } else {
                 return 'desktop';
@@ -73,9 +73,9 @@ export const useThreeScene = (
             const aspectRatio = window.innerWidth / window.innerHeight;
 
             if (deviceType === 'phone') {
-                if (aspectRatio < 0.5) {
+                if (aspectRatio < 0.55) {
                     scene.position.y = 2.5;
-                    camera.position.z = 16;
+                    camera.position.z = 18;
                     camera.position.y = 0.5;
                 } else {
                     scene.position.y = 2.7;
@@ -84,8 +84,13 @@ export const useThreeScene = (
                 }
                 controls.minDistance = 8;
             } else if (deviceType === 'tablet') {
-                scene.position.y = 0;
-                camera.position.z = 12;
+                if (aspectRatio < 1) {
+                    scene.position.y = 1;
+                    camera.position.z = 14;
+                } else {
+                    scene.position.y = 0;
+                    camera.position.z = 12;
+                }
                 controls.minDistance = 6;
             } else {
                 scene.position.y = 0;
