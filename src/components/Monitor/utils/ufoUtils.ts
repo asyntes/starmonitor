@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+type UFOPhase = 'approaching' | 'hovering' | 'spinning' | 'leaving';
+
 interface UFOInstance {
     group: THREE.Group;
     velocity: THREE.Vector3;
@@ -10,6 +12,11 @@ interface UFOInstance {
     fadeStartTime: number;
     fadingIn: boolean;
     fadeInStartTime: number;
+    phase: UFOPhase;
+    phaseStartTime: number;
+    originalRotation: THREE.Euler;
+    spinDirection: number;
+    hasVisitedEarth: boolean;
 }
 
 let ufoInstance: UFOInstance | null = null;
@@ -108,6 +115,15 @@ export const getRandomTargetPosition = (currentPos: THREE.Vector3): THREE.Vector
     return position;
 };
 
+export const getEarthProximityPosition = (): THREE.Vector3 => {
+    const angle = Math.random() * Math.PI * 2;
+    const x = Math.cos(angle) * 5.3;
+    const z = Math.sin(angle) * 5.3;
+    const y = (Math.random() - 0.5) * 1;
+    
+    return new THREE.Vector3(x, y, z);
+};
+
 export const forceUFODisappear = (): void => {
     if (ufoInstance && !ufoInstance.fadingOut) {
         ufoInstance.fadingOut = true;
@@ -145,7 +161,12 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             fadingOut: false,
             fadeStartTime: 0,
             fadingIn: true,
-            fadeInStartTime: now
+            fadeInStartTime: now,
+            phase: 'approaching',
+            phaseStartTime: now,
+            originalRotation: new THREE.Euler(0, 0, 0),
+            spinDirection: Math.random() > 0.5 ? 1 : -1,
+            hasVisitedEarth: false
         };
 
         scene.add(ufoGroup);
@@ -202,27 +223,107 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             }
         }
 
-        const direction = new THREE.Vector3()
-            .subVectors(ufo.targetPosition, ufo.group.position)
-            .normalize();
+        const phaseElapsed = now - ufo.phaseStartTime;
+        
+        switch (ufo.phase) {
+            case 'approaching': {
+                if (!ufo.hasVisitedEarth) {
+                    ufo.targetPosition = getEarthProximityPosition();
+                    ufo.hasVisitedEarth = true;
+                }
 
-        const speed = 0.02;
-        ufo.velocity.lerp(direction.multiplyScalar(speed), 0.1);
-        ufo.group.position.add(ufo.velocity);
+                const direction = new THREE.Vector3()
+                    .subVectors(ufo.targetPosition, ufo.group.position)
+                    .normalize();
 
-        if (ufo.group.position.length() < 5.5) {
-            ufo.group.position.normalize().multiplyScalar(5.5);
-            ufo.targetPosition = getRandomTargetPosition(ufo.group.position);
+                const speed = 0.02;
+                ufo.velocity.lerp(direction.multiplyScalar(speed), 0.1);
+                ufo.group.position.add(ufo.velocity);
+
+                if (ufo.group.position.distanceTo(ufo.targetPosition) < 0.3) {
+                    ufo.phase = 'hovering';
+                    ufo.phaseStartTime = now;
+                    ufo.velocity.set(0, 0, 0);
+                    ufo.originalRotation.copy(ufo.group.rotation);
+                }
+
+                ufo.bobOffset += deltaTime * 2;
+                const bobAmount = Math.sin(ufo.bobOffset) * 0.01;
+                ufo.group.position.y += bobAmount;
+                ufo.group.rotation.y += deltaTime * 0.5;
+                break;
+            }
+
+            case 'hovering': {
+                const tiltProgress = Math.min(phaseElapsed / 1500, 1);
+                
+                ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
+                ufo.group.rotateX(THREE.MathUtils.lerp(0, -Math.PI / 2, tiltProgress));
+                
+                ufo.bobOffset += deltaTime * 2;
+                const bobAmount = Math.sin(ufo.bobOffset) * 0.015;
+                ufo.group.position.y += bobAmount;
+
+                if (phaseElapsed > 2000) {
+                    ufo.phase = 'spinning';
+                    ufo.phaseStartTime = now;
+                }
+                break;
+            }
+
+            case 'spinning': {
+                ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
+                ufo.group.rotateX(-Math.PI / 2);
+                ufo.group.rotateY(phaseElapsed * 0.02);
+                
+                ufo.bobOffset += deltaTime * 3;
+                const bobAmount = Math.sin(ufo.bobOffset) * 0.02;
+                ufo.group.position.y += bobAmount;
+
+                if (phaseElapsed > 5000) {
+                    ufo.phase = 'leaving';
+                    ufo.phaseStartTime = now;
+                    ufo.targetPosition = getRandomTargetPosition(ufo.group.position);
+                }
+                break;
+            }
+
+            case 'leaving': {
+                const restoreProgress = Math.min(phaseElapsed / 2000, 1);
+                
+                if (restoreProgress < 1) {
+                    ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
+                    ufo.group.rotateX(THREE.MathUtils.lerp(-Math.PI / 2, 0, restoreProgress));
+                } else {
+                    ufo.group.rotation.x = 0;
+                    ufo.group.rotation.z = 0;
+                }
+
+                const direction = new THREE.Vector3()
+                    .subVectors(ufo.targetPosition, ufo.group.position)
+                    .normalize();
+
+                const speed = 0.02;
+                ufo.velocity.lerp(direction.multiplyScalar(speed), 0.1);
+                ufo.group.position.add(ufo.velocity);
+
+                ufo.bobOffset += deltaTime * 2;
+                const bobAmount = Math.sin(ufo.bobOffset) * 0.01;
+                ufo.group.position.y += bobAmount;
+                ufo.group.rotation.y += deltaTime * 0.5;
+
+                if (ufo.group.position.distanceTo(ufo.targetPosition) < 0.5) {
+                    ufo.targetPosition = getRandomTargetPosition(ufo.group.position);
+                }
+                break;
+            }
         }
 
-        ufo.bobOffset += deltaTime * 2;
-        const bobAmount = Math.sin(ufo.bobOffset) * 0.01;
-        ufo.group.position.y += bobAmount;
-
-        ufo.group.rotation.y += deltaTime * 0.5;
-
-        if (ufo.group.position.distanceTo(ufo.targetPosition) < 0.5) {
-            ufo.targetPosition = getRandomTargetPosition(ufo.group.position);
+        if (ufo.group.position.length() < 5.5 && ufo.phase !== 'hovering' && ufo.phase !== 'spinning') {
+            ufo.group.position.normalize().multiplyScalar(5.5);
+            if (ufo.phase === 'leaving') {
+                ufo.targetPosition = getRandomTargetPosition(ufo.group.position);
+            }
         }
 
         if (!ufo.fadingOut && !ufo.fadingIn) {
