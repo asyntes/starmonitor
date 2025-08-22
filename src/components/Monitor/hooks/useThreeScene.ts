@@ -53,7 +53,6 @@ export const useThreeScene = (
         const getDeviceType = () => {
             const width = window.innerWidth;
             const height = window.innerHeight;
-            const isLandscape = width > height;
             const maxDimension = Math.max(width, height);
             const minDimension = Math.min(width, height);
 
@@ -61,7 +60,7 @@ export const useThreeScene = (
                 (minDimension > 600 && maxDimension <= 1366);
 
             if (isTablet) {
-                return isLandscape ? 'tablet-landscape' : 'tablet-portrait';
+                return 'tablet';
             } else if (maxDimension <= 768) {
                 return 'phone';
             } else {
@@ -84,10 +83,10 @@ export const useThreeScene = (
                     camera.position.y = 2;
                 }
                 controls.minDistance = 8;
-            } else if (deviceType === 'tablet-portrait') {
-                scene.position.y = 2;
-                camera.position.z = 18;
-                camera.position.y = 0.5;
+            } else if (deviceType === 'tablet') {
+                scene.position.y = 0;
+                camera.position.z = 10;
+                camera.position.y = 2;
                 controls.minDistance = 6;
             } else {
                 scene.position.y = 0;
