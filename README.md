@@ -12,7 +12,7 @@
   - 🔴 **Unavailable**: Countries without service access
 - **Mobile Responsive**: Optimized for desktop, tablet, and mobile devices
 - **Real-time Counter**: Live satellite count display
-- **UFO Easter Egg**: Hidden UFO that occasionally appears and flies around Earth
+- **UFO Easter Egg**: Hidden UFO that occasionally appears with realistic abduction behavior - approaches Earth, hovers, tilts and activates tractor beam, then leaves
 
 ## Tech Stack
 

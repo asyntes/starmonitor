@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-type UFOPhase = 'approaching' | 'hovering' | 'abducting' | 'leaving';
+type UFOPhase = 'approaching' | 'tilting' | 'abducting' | 'leaving';
 
 interface UFOInstance {
     group: THREE.Group;
@@ -268,7 +268,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
                 ufo.group.position.add(ufo.velocity);
 
                 if (ufo.group.position.distanceTo(ufo.targetPosition) < 0.3) {
-                    ufo.phase = 'hovering';
+                    ufo.phase = 'tilting';
                     ufo.phaseStartTime = now;
                     ufo.velocity.set(0, 0, 0);
                     ufo.originalRotation.copy(ufo.group.rotation);
@@ -289,7 +289,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
                 break;
             }
 
-            case 'hovering': {
+            case 'tilting': {
                 const tiltProgress = Math.min(phaseElapsed / 1500, 1);
                 
                 ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
@@ -381,7 +381,7 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             }
         }
 
-        if (ufo.group.position.length() < 5.5 && ufo.phase !== 'hovering' && ufo.phase !== 'abducting') {
+        if (ufo.group.position.length() < 5.5 && ufo.phase !== 'tilting' && ufo.phase !== 'abducting') {
             ufo.group.position.normalize().multiplyScalar(5.5);
             if (ufo.phase === 'leaving') {
                 ufo.targetPosition = getRandomTargetPosition(ufo.group.position);
