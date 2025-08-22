@@ -85,7 +85,7 @@ export const useThreeScene = (
                 controls.minDistance = 8;
             } else if (deviceType === 'tablet') {
                 if (aspectRatio < 1) {
-                    scene.position.y = 1;
+                    scene.position.y = 0;
                     camera.position.z = 14;
                 } else {
                     scene.position.y = 0;
