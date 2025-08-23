@@ -292,7 +292,8 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             case 'tilting': {
                 const tiltProgress = Math.min(phaseElapsed / 1500, 1);
                 
-                ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
+                const earthPosition = new THREE.Vector3(0, scene.position.y, 0);
+                ufo.group.lookAt(earthPosition);
                 ufo.group.rotateX(THREE.MathUtils.lerp(0, -Math.PI / 2, tiltProgress));
                 
                 const tractorBeam = ufo.group.children.find(child => 
@@ -315,7 +316,8 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
             }
 
             case 'abducting': {
-                ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
+                const earthPosition = new THREE.Vector3(0, scene.position.y, 0);
+                ufo.group.lookAt(earthPosition);
                 ufo.group.rotateX(-Math.PI / 2);
                 ufo.group.rotateY(phaseElapsed * 0.02);
                 
@@ -354,7 +356,8 @@ export const updateUFO = (scene: THREE.Scene, deltaTime: number): void => {
                 }
                 
                 if (restoreProgress < 1) {
-                    ufo.group.lookAt(new THREE.Vector3(0, 0, 0));
+                    const earthPosition = new THREE.Vector3(0, scene.position.y, 0);
+                    ufo.group.lookAt(earthPosition);
                     ufo.group.rotateX(THREE.MathUtils.lerp(-Math.PI / 2, 0, restoreProgress));
                 } else {
                     ufo.group.rotation.x = 0;
