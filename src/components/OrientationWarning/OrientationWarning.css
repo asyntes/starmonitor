@@ -32,11 +32,11 @@
 }
 
 .orientation-icon {
-    width: 80px;
-    height: 80px;
+    width: 5rem;
+    height: 5rem;
     background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
+    border: 0.125rem solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -44,10 +44,10 @@
 }
 
 .phone-icon {
-    width: 40px;
-    height: 60px;
-    border: 2px solid #ffffff;
-    border-radius: 8px;
+    width: 2.5rem;
+    height: 3.75rem;
+    border: 0.125rem solid #ffffff;
+    border-radius: 0.5rem;
     position: relative;
     background: transparent;
 }
@@ -55,24 +55,24 @@
 .phone-icon::before {
     content: '';
     position: absolute;
-    top: 5px;
+    top: 0.3125rem;
     left: 50%;
     transform: translateX(-50%);
-    width: 20px;
-    height: 2px;
+    width: 1.25rem;
+    height: 0.125rem;
     background: #ffffff;
-    border-radius: 1px;
+    border-radius: 0.0625rem;
 }
 
 .phone-icon::after {
     content: '';
     position: absolute;
-    bottom: 5px;
+    bottom: 0.3125rem;
     left: 50%;
     transform: translateX(-50%);
-    width: 12px;
-    height: 12px;
-    border: 2px solid #ffffff;
+    width: 0.5rem;
+    height: 0.5rem;
+    border: 0.125rem solid #ffffff;
     border-radius: 50%;
 }
 
@@ -148,13 +148,13 @@
     }
 
     .orientation-icon {
-        width: 60px;
-        height: 60px;
+        width: 3.75rem;
+        height: 3.75rem;
     }
 
     .phone-icon {
-        width: 30px;
-        height: 45px;
+        width: 1.875rem;
+        height: 2.8125rem;
     }
 
     .orientation-title {
