@@ -717,8 +717,7 @@
             "expected": "Service date is unknown at this time"
         },
         "LI": {
-            "status": "coming_soon",
-            "expected": "Service date is unknown at this time"
+            "status": "launched"
         },
         "ML": {
             "status": "coming_soon",
@@ -809,7 +808,7 @@
         },
         "BN": {
             "status": "coming_soon",
-            "expected": "Sold Out"
+            "expected": "Pending regulatory approval"
         },
         "SA": {
             "status": "coming_soon",
