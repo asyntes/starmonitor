@@ -7,9 +7,9 @@
 - **Interactive 3D Earth**: Mouse-controlled globe with orbital visualization
 - **Service Availability Map**: Starlink service status by country (manually updated from static data)
 - **Dynamic Country Classification**:
-  - ⚪ **Available**: Countries with active Starlink service
-  - 🟠 **Coming Soon**: Countries with planned service rollout
-  - 🔴 **Unavailable**: Countries without service access
+  - **Available**: Countries with active Starlink service
+  - **Coming Soon**: Countries with planned service rollout
+  - **Unavailable**: Countries without service access
 - **Mobile Responsive**: Optimized for desktop, tablet, and mobile devices
 - **Real-time Counter**: Live satellite count display
 - **UFO Easter Egg**: Hidden UFO that occasionally appears with realistic abduction behavior - approaches Earth, hovers, tilts and activates tractor beam, then leaves
