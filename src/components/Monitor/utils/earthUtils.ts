@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import earthMap from '../../../assets/earth_atmos_2048.jpg?url';
-import earthNormal from '../../../assets/earth_normal_2048.jpg?url';
+
+const earthMap = '/earth_atmos_2048.jpg';
+const earthNormal = '/earth_normal_2048.jpg';
 
 export const createCleanSpaceSkybox = (scene: THREE.Scene) => {
     const skyboxGeometry = new THREE.SphereGeometry(1000, 60, 40);

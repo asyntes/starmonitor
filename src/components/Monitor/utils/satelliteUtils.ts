@@ -56,7 +56,7 @@ export const fetchTLEData = async (): Promise<TLEData[]> => {
 
     // In development: use CORS proxy
     // In production: use direct HTTPS URL (this code block gets removed in production build)
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === 'development') {
         finalUrl = `https://corsproxy.io/?${encodeURIComponent(celestrakUrl)}`;
     } else {
         finalUrl = celestrakUrl;

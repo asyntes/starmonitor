@@ -1,3 +1,19 @@
+@font-face {
+    font-family: 'Nimbus';
+    src: url('/fonts/NimbusSanL-Reg.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nimbus';
+    src: url('/fonts/NimbusSanL-Bol.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -29,8 +45,7 @@ body {
 }
 
 html,
-body,
-#root {
+body {
   height: 100%;
   margin: 0;
   padding: 0;
