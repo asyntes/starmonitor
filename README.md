@@ -1,6 +1,6 @@
 # Starmonitor
 
-3D visualization of Starlink satellites orbiting Earth using React, Three.js and live satellite data from CelesTrak.
+3D visualization of Starlink satellites orbiting Earth using Next.js, React, Three.js and live satellite data from CelesTrak.
 ## Features
 
 - **Live Satellite Tracking**: Real-time position updates for all Starlink satellites
@@ -16,7 +16,8 @@
 
 ## Tech Stack
 
-- **Frontend**: React 19 + TypeScript + Vite
+- **Framework**: Next.js 16 (with Turbopack)
+- **Frontend**: React 19 + TypeScript
 - **3D Rendering**: Three.js with WebGL
 - **Orbital Calculations**: satellite.js library
 - **Data Sources**:
@@ -33,7 +34,14 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser.
+Open `http://localhost:3000` in your browser.
+
+### Build & Deploy
+
+```bash
+npm run build    # Build for production
+npm run start    # Start production server
+```
 
 ## How It Works
 
