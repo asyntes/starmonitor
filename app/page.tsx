@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import Monitor from './components/Monitor/Monitor';
-import Header from './components/Header/Header';
-import LoadingScreen from './components/LoadingScreen/LoadingScreen';
-import OrientationWarning from './components/OrientationWarning/OrientationWarning';
+'use client';
 
-const App: React.FC = () => {
+import { useState } from 'react';
+import Monitor from '../src/components/Monitor/Monitor';
+import Header from '../src/components/Header/Header';
+import LoadingScreen from '../src/components/LoadingScreen/LoadingScreen';
+import OrientationWarning from '../src/components/OrientationWarning/OrientationWarning';
+
+export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
@@ -28,6 +30,4 @@ const App: React.FC = () => {
       />
     </div>
   );
-};
-
-export default App;
+}
