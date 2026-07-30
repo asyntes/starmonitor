@@ -158,7 +158,9 @@ const COUNTRY_NAME_TO_CODE_MAP: Record<string, string> = {
 };
 
 export const fetchStarlinkAvailability = async (): Promise<void> => {
-    const localUrl = '/json/availability.json';  // Percorso relativo alla root public
+    // Local mirror of Starlink's public map feed. See public/json/DATA_NOTICE.md
+    // and `npm run sync:availability` / .github/workflows/sync-starlink-availability.yml
+    const localUrl = '/json/availability.json';
 
     try {
         const response = await fetch(localUrl);

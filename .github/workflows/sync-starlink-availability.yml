@@ -1,0 +1,67 @@
+name: Sync Starlink availability
+
+# Weekly low-frequency mirror of Starlink’s public map availability JSON.
+# Opens a PR when the feed changes. Not an official Starlink API integration.
+on:
+  schedule:
+    # Mondays 06:00 UTC — availability changes infrequently.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-starlink-availability
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Sync availability feed
+        run: node scripts/sync-starlink-availability.mjs
+
+      - name: Create pull request when data changed
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            chore: sync Starlink availability map data
+
+            Update public/json/availability.json from Starlink’s public map
+            feed (api.starlink.com/public-files/availability.json).
+          branch: chore/sync-starlink-availability
+          delete-branch: true
+          title: Sync Starlink availability map data
+          body: |
+            ## Summary
+
+            Automated sync of `public/json/availability.json` from Starlink’s
+            public map feed:
+
+            - Source: https://api.starlink.com/public-files/availability.json
+            - Map: https://www.starlink.com/map
+
+            This workflow fetches the public JSON at most weekly, attributes
+            the source in `public/json/availability.meta.json`, and does not
+            hotlink the feed from browsers.
+
+            Starmonitor is not affiliated with SpaceX or Starlink. Availability
+            data remains their material; stop or disable this workflow if they
+            request it.
+
+            Triggered by: `${{ github.event_name }}`
+          add-paths: |
+            public/json/availability.json
+            public/json/availability.meta.json

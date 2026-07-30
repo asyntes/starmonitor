@@ -1,0 +1,12 @@
+{
+  "sourceUrl": "https://api.starlink.com/public-files/availability.json",
+  "mapUrl": "https://www.starlink.com/map",
+  "provider": "SpaceX / Starlink",
+  "attribution": "Service availability data is sourced from Starlink’s public map feed and remains their material. This project is not affiliated with SpaceX or Starlink.",
+  "syncedAt": "2026-07-30T14:27:45.644Z",
+  "etag": "\"7c8110c7648de45846e78e9f1a203272\"",
+  "lastModified": "Tue, 28 Jul 2026 21:59:27 GMT",
+  "contentSha256": "c646296e5ac9fc9fdd9071272b88d63c41cfcc713e8c64a982d5db6c20922faf",
+  "admin0Count": 255,
+  "admin1Count": 46
+}
