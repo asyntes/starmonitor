@@ -49,7 +49,18 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+html:has(.App),
+body:has(.App) {
   overflow: hidden;
+}
+
+html:has(.privacy-page),
+body:has(.privacy-page) {
+  height: auto;
+  min-height: 100%;
+  overflow: auto;
 }
 
 .App {
