@@ -1,18 +1,39 @@
+'use client';
+
 import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import './Header.css';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+    variant?: 'overlay' | 'solid';
+}
+
+const Header: React.FC<HeaderProps> = ({ variant = 'overlay' }) => {
+    const pathname = usePathname();
+    const isPrivacy = pathname === '/privacy';
+
     return (
-        <header className="app-header">
+        <header className={`app-header${variant === 'solid' ? ' app-header-solid' : ''}`}>
             <div className="header-content">
                 <div className="header-left">
-                    <h1 className="main-title">STARMONITOR</h1>
+                    <Link href="/" className="title-link">
+                        <h1 className="main-title">STARMONITOR</h1>
+                    </Link>
                     <span className="subtitle">Starlink Tracker by Asyntes</span>
                 </div>
                 <div className="header-right">
-                    <a 
-                        href="https://github.com/asyntes/starmonitor" 
-                        target="_blank" 
+                    <Link
+                        href="/privacy"
+                        className={`privacy-link${isPrivacy ? ' is-active' : ''}`}
+                        title="Informativa sulla privacy"
+                        aria-current={isPrivacy ? 'page' : undefined}
+                    >
+                        Privacy
+                    </Link>
+                    <a
+                        href="https://github.com/asyntes/starmonitor"
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="github-link"
                         title="View on GitHub"
