@@ -21,7 +21,7 @@
 - **3D Rendering**: Three.js with WebGL
 - **Orbital Calculations**: satellite.js library
 - **Data Sources**:
-  - Satellite TLE data from CelesTrak API
+  - Satellite TLE data from CelesTrak: supplemental GP (SupGP) fitted from SpaceX ephemerides, with 18 SDS GP as fallback
   - Service availability from Starlink availability data (static JSON)
   - Country borders from GeoJSON data
 
@@ -47,7 +47,7 @@ npm run start    # Start production server
 
 The application combines multiple data sources:
 
-1. **Satellite Positions**: Fetches Two-Line Element (TLE) data from CelesTrak and calculates precise orbital positions using satellite.js
+1. **Satellite Positions**: Fetches Two-Line Element (TLE) data from CelesTrak supplemental GP (fitted from SpaceX ephemerides) and calculates orbital positions using satellite.js. Objects missing from SupGP, or a failed SupGP download, fall back to the 18 SDS GP elements
 2. **Service Availability**: Loads static service availability data from local JSON (sourced from Starlink and updated manually)
 3. **Geographic Visualization**: Renders country borders from GeoJSON data with dynamic color coding based on service availability
 4. **Real-time Updates**: Satellite positions update every second, service data is static and refreshed via manual updates
