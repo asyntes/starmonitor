@@ -567,8 +567,7 @@
             "expected": "Service date is unknown at this time"
         },
         "TC": {
-            "status": "coming_soon",
-            "expected": "Starting in 2026"
+            "status": "launched"
         },
         "TR": {
             "status": "coming_soon",
@@ -607,8 +606,7 @@
             "expected": "Starting in 2026"
         },
         "UG": {
-            "status": "coming_soon",
-            "expected": "Starting in 2026"
+            "status": "launched"
         },
         "KW": {
             "status": "launched"
@@ -630,8 +628,7 @@
             "expected": "Service date is unknown at this time"
         },
         "GQ": {
-            "status": "coming_soon",
-            "expected": "Starting in 2026"
+            "status": "launched"
         },
         "ST": {
             "status": "launched"
@@ -699,8 +696,7 @@
             "expected": "Service date is unknown at this time"
         },
         "LB": {
-            "status": "coming_soon",
-            "expected": "Service date is unknown at this time"
+            "status": "launched"
         },
         "LI": {
             "status": "launched"
@@ -761,8 +757,7 @@
             "expected": "Service date is unknown at this time"
         },
         "VN": {
-            "status": "coming_soon",
-            "expected": "Pending regulatory approval"
+            "status": "launched"
         },
         "AI": {
             "status": "coming_soon",
