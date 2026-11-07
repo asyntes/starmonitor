@@ -10,7 +10,8 @@ import { NoisePass } from '../utils/noiseUtils';
 export const useThreeScene = (
     mountRef: React.RefObject<HTMLDivElement | null>,
     setSatelliteCount: (count: number) => void,
-    setIsLoading: (loading: boolean) => void
+    setIsLoading: (loading: boolean) => void,
+    setHasError: (hasError: boolean) => void
 ) => {
     useEffect(() => {
         const currentMount = mountRef.current;
@@ -149,6 +150,7 @@ export const useThreeScene = (
                     const { positions, satrecs, geometry } = createSatellitePoints(scene, tleData);
 
                     setSatelliteCount(satrecs.length);
+                    setHasError(false);
                     setIsLoading(false);
 
                     const intervalId = setInterval(() => {
@@ -173,6 +175,8 @@ export const useThreeScene = (
                 })
                 .catch(error => {
                     console.error('Errore fetch TLE:', error);
+                    setHasError(true);
+                    setSatelliteCount(0);
                     setIsLoading(false);
                 });
         });
@@ -258,5 +262,5 @@ export const useThreeScene = (
             noisePass.dispose();
             cleanupFunctions.forEach(cleanup => cleanup());
         };
-    }, [mountRef, setSatelliteCount, setIsLoading]);
+    }, [mountRef, setSatelliteCount, setIsLoading, setHasError]);
 };

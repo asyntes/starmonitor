@@ -12,9 +12,16 @@ interface MonitorProps {
 
 const Monitor: React.FC<MonitorProps> = ({ onLoadingStateChange }) => {
     const mountRef = useRef<HTMLDivElement>(null);
-    const { satelliteCount, isLoading, setSatelliteCount, setIsLoading } = useSatelliteData();
+    const {
+        satelliteCount,
+        isLoading,
+        hasError,
+        setSatelliteCount,
+        setIsLoading,
+        setHasError,
+    } = useSatelliteData();
 
-    useThreeScene(mountRef, setSatelliteCount, setIsLoading);
+    useThreeScene(mountRef, setSatelliteCount, setIsLoading, setHasError);
 
     useEffect(() => {
         onLoadingStateChange(isLoading);
@@ -23,7 +30,7 @@ const Monitor: React.FC<MonitorProps> = ({ onLoadingStateChange }) => {
     return (
         <>
             <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
-            <SatelliteCounter count={satelliteCount} isLoading={isLoading} />
+            <SatelliteCounter count={satelliteCount} isLoading={isLoading} hasError={hasError} />
             <Legend />
         </>
     );
