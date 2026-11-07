@@ -23,7 +23,7 @@ export const privacyCopy: Record<PrivacyLocale, PrivacyCopy> = {
         documentTitle: 'Informativa sulla privacy',
         legalRef: 'ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (“GDPR”)',
         lastUpdatedLabel: 'Ultimo aggiornamento',
-        lastUpdatedValue: '18 settembre 2026',
+        lastUpdatedValue: '8 novembre 2026',
         switchLabel: 'Lingua',
         backToTracker: 'Torna al tracker',
         sections: [
@@ -55,7 +55,7 @@ export const privacyCopy: Record<PrivacyLocale, PrivacyCopy> = {
                 ],
                 bullets: [
                     'dati tecnici di navigazione (indirizzo IP, user agent, data e ora della richiesta, URL richiesto, codice di risposta), registrati dal fornitore di hosting per erogare, proteggere e diagnosticare il sito;',
-                    'l’indirizzo IP e dati tecnici analoghi trasmessi a CelesTrak quando il browser richiede i dati orbitali (TLE) dei satelliti Starlink, operazione indispensabile per calcolare e mostrare le posizioni in tempo reale.',
+                    'nessun contatto diretto del browser del visitatore con CelesTrak: il server del sito scarica i dati orbitali pubblici (TLE) dei satelliti Starlink da CelesTrak e li fornisce al client, operazione indispensabile per calcolare e mostrare le posizioni in tempo reale.',
                 ],
                 closing: [
                     'I dati sulla disponibilità del servizio Starlink e i confini geografici sono caricati da file statici ospitati sullo stesso sito: in produzione non vengono inviate richieste a terzi per queste mappe.',
@@ -81,7 +81,7 @@ export const privacyCopy: Record<PrivacyLocale, PrivacyCopy> = {
                 ],
                 bullets: [
                     'Vercel Inc., fornitore di hosting e rete di distribuzione dei contenuti del sito, in qualità di responsabile del trattamento;',
-                    'CelesTrak (celestrak.org), che riceve la richiesta dei dati TLE direttamente dal browser dell’utente e tratta tali dati tecnici come titolare autonomo.',
+                    'CelesTrak (celestrak.org), da cui il server del sito scarica i dati orbitali pubblici; i visitatori non contattano CelesTrak e non trasmettono a CelesTrak il proprio indirizzo IP tramite Starmonitor.',
                 ],
                 closing: [
                     'I dati non sono oggetto di diffusione e non sono comunicati a terzi per finalità commerciali.',
@@ -91,7 +91,7 @@ export const privacyCopy: Record<PrivacyLocale, PrivacyCopy> = {
                 title: '6. Trasferimenti extra-UE',
                 paragraphs: [
                     'Vercel e CelesTrak possono trattare dati tecnici negli Stati Uniti o in altri Paesi extra SEE.',
-                    'Per Vercel il trasferimento avviene sulla base delle Clausole Contrattuali Standard e delle misure descritte nella relativa documentazione privacy. La comunicazione a CelesTrak è limitata a quanto tecnicamente necessario per ottenere i dati orbitali pubblici e consentire il funzionamento del tracker.',
+                    'Per Vercel il trasferimento avviene sulla base delle Clausole Contrattuali Standard e delle misure descritte nella relativa documentazione privacy. Il server del sito contatta CelesTrak solo per ottenere dati orbitali pubblici e consentire il funzionamento del tracker; i visitatori non inviano richieste a CelesTrak.',
                 ],
                 links: [
                     { label: 'Informativa privacy di Vercel', href: 'https://vercel.com/legal/privacy-policy' },
@@ -141,7 +141,7 @@ export const privacyCopy: Record<PrivacyLocale, PrivacyCopy> = {
         documentTitle: 'Privacy policy',
         legalRef: 'pursuant to Articles 13 and 14 of Regulation (EU) 2016/679 (“GDPR”)',
         lastUpdatedLabel: 'Last updated',
-        lastUpdatedValue: '18 September 2026',
+        lastUpdatedValue: '8 November 2026',
         switchLabel: 'Language',
         backToTracker: 'Back to tracker',
         sections: [
@@ -173,7 +173,7 @@ export const privacyCopy: Record<PrivacyLocale, PrivacyCopy> = {
                 ],
                 bullets: [
                     'technical browsing data (IP address, user agent, date and time of the request, requested URL, response code), recorded by the hosting provider to deliver, protect, and diagnose the site;',
-                    'the IP address and similar technical data sent to CelesTrak when the browser requests Starlink orbital (TLE) data, which is required to calculate and display live satellite positions.',
+                    'no direct contact from the visitor’s browser to CelesTrak: the site server downloads public Starlink orbital (TLE) data from CelesTrak and serves it to the client, which is required to calculate and display live satellite positions.',
                 ],
                 closing: [
                     'Starlink service-availability data and geographic borders are loaded from static files hosted on this site: in production no third-party requests are made for those maps.',
@@ -199,7 +199,7 @@ export const privacyCopy: Record<PrivacyLocale, PrivacyCopy> = {
                 ],
                 bullets: [
                     'Vercel Inc., the site’s hosting and content-delivery provider, acting as a processor;',
-                    'CelesTrak (celestrak.org), which receives the TLE request directly from your browser and processes that technical data as an independent controller.',
+                    'CelesTrak (celestrak.org), from which the site server downloads public orbital data; visitors do not contact CelesTrak and do not send their IP address to CelesTrak through Starmonitor.',
                 ],
                 closing: [
                     'Data is not disclosed to the public and is not shared with third parties for commercial purposes.',
@@ -209,7 +209,7 @@ export const privacyCopy: Record<PrivacyLocale, PrivacyCopy> = {
                 title: '6. Transfers outside the EU',
                 paragraphs: [
                     'Vercel and CelesTrak may process technical data in the United States or other countries outside the EEA.',
-                    'Transfers to Vercel rely on Standard Contractual Clauses and the safeguards described in Vercel’s privacy documentation. Communication to CelesTrak is limited to what is technically necessary to obtain public orbital data and operate the tracker.',
+                    'Transfers to Vercel rely on Standard Contractual Clauses and the safeguards described in Vercel’s privacy documentation. The site server contacts CelesTrak only to obtain public orbital data and operate the tracker; visitors do not send requests to CelesTrak.',
                 ],
                 links: [
                     { label: 'Vercel privacy policy', href: 'https://vercel.com/legal/privacy-policy' },
