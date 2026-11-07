@@ -37,6 +37,8 @@
 }
 
 .app-header-solid {
+    position: sticky;
+    top: 0;
     background: rgba(5, 5, 5, 0.88);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
