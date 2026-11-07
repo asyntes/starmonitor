@@ -51,7 +51,7 @@
     letter-spacing: 0.12rem;
     text-transform: uppercase;
     padding: 0.5rem 0.75rem;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     transition: all 0.3s ease;
 }
 
@@ -70,7 +70,7 @@
     text-shadow:
         0 0 10px rgba(255, 255, 255, 0.3),
         0 0 20px rgba(255, 255, 255, 0.1);
-    letter-spacing: 2px;
+    letter-spacing: 0.125rem;
     text-transform: uppercase;
 }
 
@@ -80,7 +80,7 @@
     font-weight: 300;
     color: rgba(255, 255, 255, 0.8);
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-    letter-spacing: 0.5px;
+    letter-spacing: 0.03125rem;
     margin-top: 0.2rem;
 }
 
@@ -89,7 +89,7 @@
     text-decoration: none;
     transition: all 0.3s ease;
     padding: 0.5rem;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -98,12 +98,12 @@
 .github-link:hover {
     color: rgba(255, 255, 255, 1);
     background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-1px);
+    transform: translateY(-0.0625rem);
 }
 
 .github-link svg {
-    width: 24px;
-    height: 24px;
+    width: 1.5rem;
+    height: 1.5rem;
     transition: all 0.3s ease;
 }
 
@@ -126,7 +126,7 @@
 
     .main-title {
         font-size: clamp(1.5rem, 5vw, 2rem);
-        letter-spacing: 1px;
+        letter-spacing: 0.0625rem;
     }
 
     .subtitle {
@@ -145,8 +145,8 @@
     }
 
     .github-link svg {
-        width: 20px;
-        height: 20px;
+        width: 1.25rem;
+        height: 1.25rem;
     }
 }
 
@@ -173,7 +173,7 @@
     }
 
     .github-link svg {
-        width: 18px;
-        height: 18px;
+        width: 1.125rem;
+        height: 1.125rem;
     }
 }
